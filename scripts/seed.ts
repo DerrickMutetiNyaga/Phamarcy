@@ -193,15 +193,15 @@ interface SaleSeed {
 const SALES: SaleSeed[] = [
   { daysAgo: 13, hour: 9, minute: 42, customer: "emily", soldBy: "cashier", paymentMethod: "cash", items: [{ medicine: "panadol", quantity: 3 }, { medicine: "zyrtec", quantity: 2 }] },
   { daysAgo: 11, hour: 17, minute: 5, customer: null, soldBy: "cashier", paymentMethod: "card", items: [{ medicine: "benadryl", quantity: 1 }, { medicine: "celin", quantity: 20 }] },
-  { daysAgo: 10, hour: 11, minute: 30, customer: "robert", soldBy: "admin", paymentMethod: "upi", prescription: 0, items: [{ medicine: "glucophage", quantity: 6 }, { medicine: "norvasc", quantity: 3 }] },
+  { daysAgo: 10, hour: 11, minute: 30, customer: "robert", soldBy: "admin", paymentMethod: "mpesa", prescription: 0, items: [{ medicine: "glucophage", quantity: 6 }, { medicine: "norvasc", quantity: 3 }] },
   { daysAgo: 8, hour: 14, minute: 12, customer: "maria", soldBy: "cashier", paymentMethod: "cash", prescription: 1, items: [{ medicine: "augmentin", quantity: 2 }, { medicine: "brufen", quantity: 2, discount: 10 }] },
   { daysAgo: 7, hour: 10, minute: 8, customer: null, soldBy: "cashier", paymentMethod: "cash", items: [{ medicine: "panadol", quantity: 2 }, { medicine: "gaviscon", quantity: 1 }] },
   { daysAgo: 5, hour: 18, minute: 44, customer: "ahmed", soldBy: "cashier", paymentMethod: "card", billDiscount: 100, prescription: 2, items: [{ medicine: "lipitor", quantity: 4 }, { medicine: "cozaar", quantity: 3 }] },
-  { daysAgo: 4, hour: 12, minute: 20, customer: "emily", soldBy: "cashier", paymentMethod: "upi", items: [{ medicine: "brufen", quantity: 3 }, { medicine: "celin", quantity: 30 }], refund: "Customer returned unopened packs; wrong strength bought." },
+  { daysAgo: 4, hour: 12, minute: 20, customer: "emily", soldBy: "cashier", paymentMethod: "mpesa", items: [{ medicine: "brufen", quantity: 3 }, { medicine: "celin", quantity: 30 }], refund: "Customer returned unopened packs; wrong strength bought." },
   { daysAgo: 3, hour: 9, minute: 55, customer: "linda", soldBy: "admin", paymentMethod: "card", prescription: 3, items: [{ medicine: "azithral", quantity: 3 }, { medicine: "amoxil", quantity: 2 }] },
   { daysAgo: 2, hour: 16, minute: 32, customer: null, soldBy: "cashier", paymentMethod: "cash", items: [{ medicine: "panadol", quantity: 4 }, { medicine: "zyrtec", quantity: 3 }, { medicine: "benadryl", quantity: 2, discount: 50 }] },
   { daysAgo: 1, hour: 11, minute: 15, customer: "robert", soldBy: "cashier", paymentMethod: "cash", prescription: 0, items: [{ medicine: "glucophage", quantity: 6 }, { medicine: "lipitor", quantity: 2 }] },
-  { daysAgo: 0, hour: 9, minute: 20, customer: "maria", soldBy: "cashier", paymentMethod: "upi", items: [{ medicine: "gaviscon", quantity: 2 }, { medicine: "brufen", quantity: 1 }] },
+  { daysAgo: 0, hour: 9, minute: 20, customer: "maria", soldBy: "cashier", paymentMethod: "mpesa", items: [{ medicine: "gaviscon", quantity: 2 }, { medicine: "brufen", quantity: 1 }] },
 ];
 
 interface PrescriptionSeed {

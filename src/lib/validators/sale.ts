@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { money, objectId, positiveInt, requiredText } from "./common";
 
-export const PAYMENT_METHODS = ["cash", "card", "upi"] as const;
+export const PAYMENT_METHODS = ["cash", "mpesa", "card"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cash: "Cash",
+  mpesa: "M-Pesa",
   card: "Card",
-  upi: "UPI",
 };
 
 export const SALE_STATUSES = ["completed", "refunded"] as const;

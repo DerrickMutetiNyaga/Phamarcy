@@ -185,11 +185,12 @@ export interface PosMedicine {
   nearestExpiry: string | null;
 }
 
+export const POS_CATALOG_LIMIT = 200;
+
 export async function searchSellable(q: string, limit = 20): Promise<PosMedicine[]> {
   await connectDB();
-  if (!q) return [];
   const rows = await Medicine.aggregate<MedicineRow & { exact: number }>([
-    { $match: { isActive: true, ...searchMatch(q) } },
+    { $match: { isActive: true, ...(q ? searchMatch(q) : {}) } },
     { $addFields: { exact: { $cond: [{ $eq: ["$barcode", q] }, 0, 1] } } },
     { $sort: { exact: 1, name: 1 } },
     { $limit: limit },

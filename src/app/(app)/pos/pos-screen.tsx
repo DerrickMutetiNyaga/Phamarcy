@@ -9,6 +9,7 @@ import { RxBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { apiFetch, errorMessage } from "@/lib/client/api";
 import { printInvoice } from "@/lib/client/print";
 import { cn } from "@/lib/utils";
@@ -39,8 +40,11 @@ export function PosScreen() {
   const money = useMoney();
 
   const searchRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<AbortController | null>(null);
   const lastQueryRef = useRef("");
+  const [catalog, setCatalog] = useState<PosMedicine[] | null>(null);
+  const [catalogVersion, setCatalogVersion] = useState(0);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PosMedicine[]>([]);
   const [resultsFor, setResultsFor] = useState("");
@@ -63,6 +67,7 @@ export function PosScreen() {
     if (!trimmed) {
       setResults([]);
       setResultsFor("");
+      setHighlight(0);
       return [];
     }
     const controller = new AbortController();
@@ -86,11 +91,35 @@ export function PosScreen() {
   }, []);
 
   useEffect(() => {
+    let active = true;
+    apiFetch<PosMedicine[]>("/api/medicines/search")
+      .then((rows) => {
+        if (active) setCatalog(rows);
+      })
+      .catch((error) => {
+        if (!active) return;
+        setCatalog([]);
+        toast.error(errorMessage(error));
+      });
+    return () => {
+      active = false;
+    };
+  }, [catalogVersion]);
+
+  useEffect(() => {
     const t = setTimeout(() => {
       if (query.trim() !== lastQueryRef.current) void runSearch(query);
     }, 200);
     return () => clearTimeout(t);
   }, [query, runSearch]);
+
+  const showResults = query.trim().length > 0;
+  const rows = showResults ? results : (catalog ?? []);
+
+  function moveHighlight(index: number) {
+    setHighlight(index);
+    listRef.current?.querySelector(`[data-index="${index}"]`)?.scrollIntoView({ block: "nearest" });
+  }
 
   function addToCart(m: PosMedicine) {
     if (m.stock <= 0) {
@@ -114,20 +143,24 @@ export function PosScreen() {
   async function handleSearchKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlight((h) => Math.min(h + 1, Math.max(results.length - 1, 0)));
+      moveHighlight(Math.min(highlight + 1, Math.max(rows.length - 1, 0)));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlight((h) => Math.max(h - 1, 0));
+      moveHighlight(Math.max(highlight - 1, 0));
     } else if (e.key === "Escape") {
       setQuery("");
     } else if (e.key === "Enter") {
       e.preventDefault();
       const q = query.trim();
-      if (!q) return;
-      const rows = resultsFor === q ? results : await runSearch(q);
-      if (rows === null) return;
-      const exact = rows.find((r) => r.barcode && r.barcode === q);
-      const pick = exact ?? rows[resultsFor === q ? highlight : 0];
+      if (!q) {
+        const item = catalog?.[highlight];
+        if (item) addToCart(item);
+        return;
+      }
+      const found = resultsFor === q ? results : await runSearch(q);
+      if (found === null) return;
+      const exact = found.find((r) => r.barcode && r.barcode === q);
+      const pick = exact ?? found[resultsFor === q ? highlight : 0];
       if (pick) addToCart(pick);
       else toast.error(`No medicine matches "${q}"`);
     }
@@ -211,6 +244,7 @@ export function PosScreen() {
       setLastSale(sale);
       resetSale();
       printInvoice(sale.id);
+      setCatalogVersion((v) => v + 1);
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {
@@ -233,8 +267,6 @@ export function PosScreen() {
     return () => window.removeEventListener("keydown", onKey);
   }, [checkout]);
 
-  const showResults = query.trim().length > 0;
-
   return (
     <div className="grid h-[calc(100vh-6.5rem)] grid-cols-[minmax(0,1fr)_26rem] gap-4">
       <section className="flex min-h-0 flex-col rounded-md border border-gray-200 bg-white">
@@ -254,16 +286,38 @@ export function PosScreen() {
             />
             <ScanBarcode className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-gray-400" />
           </div>
+          <div className="mt-2 flex items-center justify-between gap-3 text-xs text-gray-500">
+            <span className="shrink-0">
+              {showResults
+                ? searching || resultsFor !== query.trim()
+                  ? "Searching..."
+                  : `${results.length} ${results.length === 1 ? "match" : "matches"}`
+                : catalog
+                  ? `Medicines (${catalog.length})`
+                  : "Loading medicines..."}
+            </span>
+            <span className="truncate text-gray-400">Up and Down to move, Enter to add, F2 to search, F9 to check out</span>
+          </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {!showResults ? (
-            <div className="flex h-full flex-col items-center justify-center gap-1 text-[13px] text-gray-500">
-              <p>Type a medicine name or scan a barcode to begin.</p>
-              <p className="text-xs text-gray-400">Up and Down to move, Enter to add, F2 to search, F9 to check out.</p>
+        <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto">
+          {!showResults && catalog === null ? (
+            <div className="divide-y divide-gray-100">
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className="flex items-center gap-4 px-3 py-3">
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
             </div>
-          ) : results.length === 0 ? (
+          ) : rows.length === 0 ? (
             <p className="px-4 py-8 text-center text-[13px] text-gray-500">
-              {searching || resultsFor !== query.trim() ? "Searching..." : "No sellable medicine matches this search."}
+              {!showResults
+                ? "No medicines in the catalog yet."
+                : searching || resultsFor !== query.trim()
+                  ? "Searching..."
+                  : "No sellable medicine matches this search."}
             </p>
           ) : (
             <table className="w-full text-[13px]">
@@ -276,9 +330,10 @@ export function PosScreen() {
                 </tr>
               </thead>
               <tbody>
-                {results.map((m, i) => (
+                {rows.map((m, i) => (
                   <tr
                     key={m._id}
+                    data-index={i}
                     onMouseEnter={() => setHighlight(i)}
                     onClick={() => addToCart(m)}
                     className={cn(
@@ -458,12 +513,16 @@ export function PosScreen() {
                 onClick={() => setPaymentMethod(m)}
                 className={cn(
                   "h-8 rounded-md border text-[13px] font-medium transition-colors",
-                  paymentMethod === m
-                    ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                  m === "mpesa"
+                    ? paymentMethod === m
+                      ? "border-mpesa bg-mpesa text-white"
+                      : "border-gray-300 bg-white text-mpesa hover:bg-mpesa/5"
+                    : paymentMethod === m
+                      ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                      : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                 )}
               >
-                {PAYMENT_METHOD_LABELS[m]}
+                {m === "mpesa" ? <span className="font-extrabold tracking-tight">M-PESA</span> : PAYMENT_METHOD_LABELS[m]}
               </button>
             ))}
           </div>
