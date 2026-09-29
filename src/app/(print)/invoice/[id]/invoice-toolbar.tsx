@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowLeft, Printer } from "lucide-react";
+import { Printer } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import { BackLink } from "@/components/data/detail-hero";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -15,18 +16,18 @@ export function InvoiceToolbar({ saleId, size, autoPrint }: { saleId: string; si
 
   return (
     <div className="no-print mx-auto mb-4 flex max-w-[210mm] items-center justify-between">
-      <Link href={`/sales/${saleId}`} className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="size-3.5" />
-        Back to sale
-      </Link>
+      <BackLink href={`/sales/${saleId}`} label="Back to sale" />
       <div className="flex items-center gap-2">
-        <div className="flex rounded-md border border-gray-300 bg-white p-0.5 text-xs">
+        <div className="flex rounded-lg bg-white p-0.5 text-xs shadow-xs ring-1 ring-slate-200">
           {(["a5", "a4"] as const).map((s) => (
             <Link
               key={s}
               href={`/invoice/${saleId}?size=${s}`}
               replace
-              className={cn("rounded px-2.5 py-1 font-medium", size === s ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:text-gray-900")}
+              className={cn(
+                "rounded-md px-3 py-1 font-semibold transition-colors",
+                size === s ? "bg-gradient-to-b from-emerald-500 to-emerald-600 text-white shadow-sm" : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-800"
+              )}
             >
               {s.toUpperCase()}
             </Link>

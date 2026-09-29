@@ -53,7 +53,7 @@ export function Pagination({ page, pageSize, total }: PaginationProps) {
           </Link>
           {pageList(page, last).map((p, i) =>
             p === "gap" ? (
-              <span key={`gap-${i}`} className="px-1 text-gray-400">
+              <span key={`gap-${i}`} className="px-1 text-slate-400">
                 ...
               </span>
             ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ExternalLink, Upload } from "lucide-react";
+import { CircleCheck, CircleX, ExternalLink, Eye, ScanEye, Upload } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -89,9 +89,17 @@ export function ReviewPrescriptionDialog({ row }: { row: ReviewRow }) {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          {row.status === "pending" ? "Review" : "View"}
-        </Button>
+        {row.status === "pending" ? (
+          <Button size="sm" className="from-violet-500 to-violet-600 shadow-violet-700/20 hover:from-violet-600 hover:to-violet-700">
+            <ScanEye className="size-3.5" />
+            Review
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm">
+            <Eye className="size-3.5" />
+            View
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
@@ -105,19 +113,19 @@ export function ReviewPrescriptionDialog({ row }: { row: ReviewRow }) {
             href={row.imageUrl}
             target="_blank"
             rel="noreferrer"
-            className="relative block h-[28rem] overflow-hidden rounded-md border border-gray-200 bg-gray-50"
+            className="relative block h-[28rem] overflow-hidden rounded-xl bg-[repeating-conic-gradient(#f5f3ff_0_25%,#fff_0_50%)] bg-[length:20px_20px] ring-1 ring-violet-200"
           >
             <Image src={row.imageUrl} alt="Prescription" fill sizes="600px" className="object-contain" />
           </a>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Current status</span>
+            <div className="flex items-center justify-between rounded-lg bg-violet-50 px-3 py-2 ring-1 ring-violet-100">
+              <span className="text-xs font-medium text-violet-900">Current status</span>
               <PrescriptionStatusBadge status={row.status} />
             </div>
             {row.notes && (
-              <div>
-                <p className="text-xs text-gray-500">Notes from counter</p>
-                <p className="text-[13px] text-gray-800">{row.notes}</p>
+              <div className="rounded-lg bg-amber-50 px-3 py-2 ring-1 ring-amber-100">
+                <p className="text-[11px] font-semibold tracking-wide text-amber-700 uppercase">Notes from counter</p>
+                <p className="mt-0.5 text-[13px] text-amber-950">{row.notes}</p>
               </div>
             )}
             <a href={row.imageUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-emerald-700 hover:underline">
@@ -135,9 +143,11 @@ export function ReviewPrescriptionDialog({ row }: { row: ReviewRow }) {
             Close
           </Button>
           <Button type="button" variant="destructive" onClick={() => submit("rejected")} disabled={isSubmitting}>
+            <CircleX className="size-4" />
             Reject
           </Button>
           <Button type="button" onClick={() => submit("verified")} disabled={isSubmitting}>
+            <CircleCheck className="size-4" />
             Verify
           </Button>
         </DialogFooter>

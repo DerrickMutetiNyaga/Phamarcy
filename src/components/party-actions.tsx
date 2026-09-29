@@ -30,7 +30,7 @@ export function PartyRowActions({ kind, party, redirectTo }: { kind: Kind; party
   const noun = kind === "customer" ? "customer" : "supplier";
   const history = kind === "customer" ? "sales" : "purchase";
   return (
-    <div className="flex justify-end gap-0.5">
+    <div className="flex justify-end gap-1">
       <PartyDialog kind={kind} party={party} trigger={<EditIconButton />} />
       <DeleteIconButton
         title={`Delete ${noun}?`}

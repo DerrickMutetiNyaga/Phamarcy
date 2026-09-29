@@ -1,7 +1,7 @@
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { Contact, ShoppingBag } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BackLink, DetailHero, HeroInitials } from "@/components/data/detail-hero";
 import { ListToolbar } from "@/components/data/list-toolbar";
 import { DetailGrid, EmptyState, Panel, PanelHeader } from "@/components/data/panel";
 import { TableSkeleton } from "@/components/data/table-skeleton";
@@ -45,27 +45,28 @@ export default async function CustomerDetailPage({
 
   return (
     <div className="space-y-4">
-      <Link href="/customers" className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="size-3.5" />
-        Customers
-      </Link>
+      <BackLink href="/customers" label="Customers" />
+      <DetailHero
+        media={<HeroInitials name={customer.name} />}
+        eyebrow="Customer"
+        title={customer.name}
+        subtitle={customer.phone}
+        actions={
+          <PartyRowActions
+            kind="customer"
+            redirectTo="/customers"
+            party={{
+              _id: id,
+              name: customer.name,
+              phone: customer.phone,
+              email: customer.email ?? "",
+              address: customer.address ?? "",
+            }}
+          />
+        }
+      />
       <Panel>
-        <PanelHeader
-          title={customer.name}
-          actions={
-            <PartyRowActions
-              kind="customer"
-              redirectTo="/customers"
-              party={{
-                _id: id,
-                name: customer.name,
-                phone: customer.phone,
-                email: customer.email ?? "",
-                address: customer.address ?? "",
-              }}
-            />
-          }
-        />
+        <PanelHeader title="Contact details" icon={Contact} tone="sky" />
         <DetailGrid
           items={[
             { label: "Phone", value: customer.phone },
@@ -92,6 +93,8 @@ export default async function CustomerDetailPage({
         <PanelHeader
           title="Purchase history"
           description={user.role === "cashier" ? "Showing sales you processed for this customer." : undefined}
+          icon={ShoppingBag}
+          tone="emerald"
         />
         <Suspense key={JSON.stringify(sp)} fallback={<TableSkeleton columns={7} rows={5} bare />}>
           <CustomerSales id={id} sp={sp} soldBy={user.role === "cashier" ? user.id : undefined} />

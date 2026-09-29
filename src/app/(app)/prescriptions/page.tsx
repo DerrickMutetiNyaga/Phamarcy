@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
 import { formatDateTime } from "@/lib/format";
 import { thumbnailUrl } from "@/lib/images";
+import { cn } from "@/lib/utils";
 import { PRESCRIPTION_STATUS_LABELS, PRESCRIPTION_STATUSES } from "@/lib/validators/prescription";
 import { requireUser } from "@/server/auth";
 import { dateRangeParam, oneOf, pageParam, param, type SearchParams } from "@/server/query";
@@ -53,27 +54,32 @@ async function PrescriptionsTable({ sp }: { sp: SearchParams }) {
         </TableHeader>
         <TableBody>
           {result.rows.map((r) => (
-            <TableRow key={r._id}>
+            <TableRow key={r._id} className={cn(r.status === "pending" && "bg-violet-50/40")}>
               <TableCell>
-                <a href={r.imageUrl} target="_blank" rel="noreferrer" className="block size-10 overflow-hidden rounded border border-gray-200 bg-gray-50">
+                <a
+                  href={r.imageUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block size-10 overflow-hidden rounded-lg bg-violet-50 ring-1 ring-violet-200 transition-transform hover:scale-105"
+                >
                   <Image src={thumbnailUrl(r.imageUrl, 80)} alt={`Prescription for ${r.customerName}`} width={40} height={40} className="size-10 object-cover" />
                 </a>
               </TableCell>
-              <TableCell className="font-medium">{r.customerName}</TableCell>
+              <TableCell className="font-semibold text-slate-900">{r.customerName}</TableCell>
               <TableCell className="tabular-nums">{r.phone}</TableCell>
-              <TableCell className="max-w-64 truncate text-gray-600">{r.notes || "-"}</TableCell>
-              <TableCell className="text-gray-600">
+              <TableCell className="max-w-64 truncate text-slate-600">{r.notes || "-"}</TableCell>
+              <TableCell className="text-slate-600">
                 {formatDateTime(r.createdAt)}
-                <p className="text-xs text-gray-400">{r.uploadedByName}</p>
+                <p className="text-xs text-slate-400">{r.uploadedByName}</p>
               </TableCell>
               <TableCell>
                 <PrescriptionStatusBadge status={r.status} />
               </TableCell>
-              <TableCell className="text-gray-600">
+              <TableCell className="text-slate-600">
                 {r.reviewedAt ? (
                   <>
                     {formatDateTime(r.reviewedAt)}
-                    <p className="max-w-48 truncate text-xs text-gray-400" title={r.reviewNote}>
+                    <p className="max-w-48 truncate text-xs text-slate-400" title={r.reviewNote}>
                       {r.reviewedByName}
                       {r.reviewNote ? `: ${r.reviewNote}` : ""}
                     </p>

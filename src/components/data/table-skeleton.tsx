@@ -19,7 +19,7 @@ export function TableSkeleton({ columns = 6, rows = 10, bare }: { columns?: numb
             <TableRow key={r} className="hover:bg-transparent">
               {Array.from({ length: columns }, (_, c) => (
                 <TableCell key={c}>
-                  <Skeleton className={c === 0 ? "h-3.5 w-40 bg-gray-100" : "h-3.5 w-20 bg-gray-100"} />
+                  <Skeleton className={c === 0 ? "h-3.5 w-40 bg-slate-100" : "h-3.5 w-20 bg-slate-100"} />
                 </TableCell>
               ))}
             </TableRow>

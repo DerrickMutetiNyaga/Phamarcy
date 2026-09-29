@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Pill, Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ListToolbar } from "@/components/data/list-toolbar";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
+import { categoryToneMap, DEFAULT_CATEGORY_TONE } from "@/lib/category-tones";
 import { formatDate, formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { UNIT_LABELS } from "@/lib/validators/medicine";
@@ -18,7 +19,8 @@ import { oneOf, pageParam, param, type SearchParams } from "@/server/query";
 import { listCategoryOptions, listMedicines, STOCK_FILTERS } from "@/server/services/inventory";
 import { getSettings } from "@/server/settings";
 
-async function MedicinesTable({ sp }: { sp: SearchParams }) {
+async function MedicinesTable({ sp, categoryNames }: { sp: SearchParams; categoryNames: string[] }) {
+  const tones = categoryToneMap(categoryNames);
   const [result, settings] = await Promise.all([
     listMedicines({
       q: param(sp, "q"),
@@ -70,34 +72,47 @@ async function MedicinesTable({ sp }: { sp: SearchParams }) {
           {result.rows.map((m) => {
             const out = m.stock === 0;
             const low = !out && m.stock <= m.reorderLevel;
+            const tone = tones.get(m.categoryName) ?? DEFAULT_CATEGORY_TONE;
             return (
               <TableRow key={m._id} className={cn(out && "bg-red-50/50", low && "bg-amber-50/60")}>
-                <TableCell className="max-w-72">
-                  <div className="flex items-center gap-1.5">
-                    <Link href={`/inventory/${m._id}`} className="truncate font-medium text-gray-900 hover:text-emerald-700 hover:underline">
-                      {m.name} {m.strength}
-                    </Link>
-                    {m.prescriptionRequired && <RxBadge />}
-                    {!m.isActive && <Badge>Inactive</Badge>}
+                <TableCell className="max-w-80">
+                  <div className="flex items-center gap-2.5">
+                    <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg", tone.tile)}>
+                      <Pill className="size-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <Link href={`/inventory/${m._id}`} className="truncate font-semibold text-slate-900 hover:text-emerald-700 hover:underline">
+                          {m.name} {m.strength}
+                        </Link>
+                        {m.prescriptionRequired && <RxBadge />}
+                        {!m.isActive && <Badge>Inactive</Badge>}
+                      </div>
+                      <p className="truncate text-xs text-slate-500">
+                        {m.genericName}
+                        {m.brand ? ` · ${m.brand}` : ""}
+                      </p>
+                    </div>
                   </div>
-                  <p className="truncate text-xs text-gray-500">
-                    {m.genericName}
-                    {m.brand ? ` · ${m.brand}` : ""}
-                  </p>
                 </TableCell>
-                <TableCell>{m.categoryName}</TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center gap-1.5 text-[13px]">
+                    <span className={cn("size-2 rounded-full", tone.dot)} />
+                    {m.categoryName}
+                  </span>
+                </TableCell>
                 <TableCell>{UNIT_LABELS[m.unit]}</TableCell>
-                <TableCell className="font-mono text-xs text-gray-600">{m.barcode || "-"}</TableCell>
+                <TableCell className="font-mono text-xs text-slate-600">{m.barcode || "-"}</TableCell>
                 <TableCell className="text-right tabular-nums">
                   <span className="mr-2">
                     <StockBadge stock={m.stock} reorderLevel={m.reorderLevel} />
                   </span>
                   <span className={cn("font-medium", out && "text-red-600", low && "text-amber-700")}>{m.stock}</span>
                 </TableCell>
-                <TableCell className="text-right tabular-nums text-gray-500">{m.reorderLevel}</TableCell>
-                <TableCell className="text-gray-600">{formatDate(m.nearestExpiry)}</TableCell>
-                <TableCell className="text-right tabular-nums">{formatMoney(m.salePrice, settings.currencySymbol)}</TableCell>
-                <TableCell className="text-right tabular-nums text-gray-600">{m.taxPercent}%</TableCell>
+                <TableCell className="text-right tabular-nums text-slate-500">{m.reorderLevel}</TableCell>
+                <TableCell className="text-slate-600">{formatDate(m.nearestExpiry)}</TableCell>
+                <TableCell className="text-right font-semibold text-emerald-800 tabular-nums">{formatMoney(m.salePrice, settings.currencySymbol)}</TableCell>
+                <TableCell className="text-right tabular-nums text-slate-600">{m.taxPercent}%</TableCell>
               </TableRow>
             );
           })}
@@ -147,7 +162,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
         </Button>
       </ListToolbar>
       <Suspense key={JSON.stringify(sp)} fallback={<TableSkeleton columns={9} />}>
-        <MedicinesTable sp={sp} />
+        <MedicinesTable sp={sp} categoryNames={categories.map((c) => c.label)} />
       </Suspense>
     </div>
   );

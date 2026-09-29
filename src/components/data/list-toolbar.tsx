@@ -122,7 +122,7 @@ export function ListToolbar({ searchPlaceholder, filters = [], dateRange, export
             max={searchParams.get("to") ?? undefined}
             onChange={(e) => update({ from: e.target.value || null })}
           />
-          <span className="text-xs text-gray-400">to</span>
+          <span className="text-xs text-slate-400">to</span>
           <Input
             type="date"
             aria-label="To date"

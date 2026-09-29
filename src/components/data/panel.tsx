@@ -1,15 +1,46 @@
-import { Inbox } from "lucide-react";
+import { Inbox, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+export const PANEL_TONES = {
+  emerald: { icon: "bg-emerald-100 text-emerald-700", wash: "from-emerald-50/80" },
+  sky: { icon: "bg-sky-100 text-sky-700", wash: "from-sky-50/80" },
+  amber: { icon: "bg-amber-100 text-amber-700", wash: "from-amber-50/80" },
+  violet: { icon: "bg-violet-100 text-violet-700", wash: "from-violet-50/80" },
+  rose: { icon: "bg-rose-100 text-rose-700", wash: "from-rose-50/80" },
+  teal: { icon: "bg-teal-100 text-teal-700", wash: "from-teal-50/80" },
+  indigo: { icon: "bg-indigo-100 text-indigo-700", wash: "from-indigo-50/80" },
+} as const;
+
+export type PanelTone = keyof typeof PANEL_TONES;
 
 export function Panel({ className, children }: { className?: string; children: React.ReactNode }) {
   return <div className={cn("overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm", className)}>{children}</div>;
 }
 
-export function PanelHeader({ title, actions, description }: { title: string; actions?: React.ReactNode; description?: string }) {
+export function PanelHeader({
+  title,
+  actions,
+  description,
+  icon: Icon,
+  tone = "emerald",
+}: {
+  title: string;
+  actions?: React.ReactNode;
+  description?: string;
+  icon?: LucideIcon;
+  tone?: PanelTone;
+}) {
+  const t = PANEL_TONES[tone];
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 via-white to-white px-4 py-3">
+    <div className={cn("flex items-center justify-between gap-4 border-b border-slate-100 bg-gradient-to-r via-white to-white px-4 py-3", t.wash)}>
       <div className="flex items-center gap-2.5">
-        <span className="h-5 w-1 rounded-full bg-gradient-to-b from-emerald-500 to-teal-500" />
+        {Icon ? (
+          <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg", t.icon)}>
+            <Icon className="size-4" />
+          </span>
+        ) : (
+          <span className="h-5 w-1 rounded-full bg-gradient-to-b from-emerald-500 to-teal-500" />
+        )}
         <div>
           <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
           {description && <p className="text-xs text-slate-500">{description}</p>}

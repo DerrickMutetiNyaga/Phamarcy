@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SlidersHorizontal, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,7 +36,7 @@ export function SettingsForm({ initial }: { initial: SettingsInput }) {
     <form onSubmit={onSubmit} noValidate className="max-w-3xl space-y-4">
       <FormError message={error} />
       <Panel>
-        <PanelHeader title="Pharmacy details" description="Shown in the top bar and printed on every invoice." />
+        <PanelHeader title="Pharmacy details" description="Shown in the top bar and printed on every invoice." icon={Store} tone="emerald" />
         <div className="grid grid-cols-2 gap-4 p-4">
           <Field label="Pharmacy name" htmlFor="pharmacyName" required error={errors.pharmacyName?.message} className="col-span-2">
             <Input id="pharmacyName" {...form.register("pharmacyName")} aria-invalid={!!errors.pharmacyName} />
@@ -55,7 +56,7 @@ export function SettingsForm({ initial }: { initial: SettingsInput }) {
         </div>
       </Panel>
       <Panel>
-        <PanelHeader title="Defaults" />
+        <PanelHeader title="Defaults" description="Currency and stock settings used across the system." icon={SlidersHorizontal} tone="amber" />
         <div className="grid grid-cols-2 gap-4 p-4">
           <Field label="Currency symbol" htmlFor="currencySymbol" required error={errors.currencySymbol?.message} hint="Used for display and printing only.">
             <Input id="currencySymbol" className="w-24" {...form.register("currencySymbol")} aria-invalid={!!errors.currencySymbol} />
@@ -78,7 +79,8 @@ export function SettingsForm({ initial }: { initial: SettingsInput }) {
           </Field>
         </div>
       </Panel>
-      <div className="flex justify-end gap-2">
+      <div className="sticky bottom-4 z-10 flex items-center justify-end gap-2 rounded-xl bg-white/90 p-3 shadow-lg ring-1 shadow-emerald-900/10 ring-slate-200 backdrop-blur">
+        {isDirty && <p className="mr-auto text-xs font-medium text-amber-700">You have unsaved changes.</p>}
         <Button type="button" variant="outline" disabled={!isDirty || isSubmitting} onClick={() => form.reset(initial)}>
           Discard changes
         </Button>

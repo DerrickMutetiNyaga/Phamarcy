@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Loader2, X } from "lucide-react";
+import { Boxes, ImageIcon, Loader2, Pill, Wallet, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiFetch, errorMessage } from "@/lib/client/api";
 import { thumbnailUrl } from "@/lib/images";
+import { cn } from "@/lib/utils";
 import { MEDICINE_UNITS, medicineSchema, UNIT_LABELS, type MedicineInput } from "@/lib/validators/medicine";
 import { validateImageFile } from "@/lib/validators/prescription";
 
@@ -87,7 +88,7 @@ export function MedicineForm({ medicineId, defaults, categories }: MedicineFormP
       <FormError message={serverError} />
 
       <Panel>
-        <PanelHeader title="Identification" />
+        <PanelHeader title="Identification" description="How the medicine appears at the counter and on invoices." icon={Pill} tone="sky" />
         <div className="grid gap-4 p-4 md:grid-cols-2">
           <Field label="Name" htmlFor="name" required error={errors.name?.message}>
             <Input id="name" autoFocus {...form.register("name")} aria-invalid={!!errors.name} />
@@ -169,7 +170,7 @@ export function MedicineForm({ medicineId, defaults, categories }: MedicineFormP
       </Panel>
 
       <Panel>
-        <PanelHeader title="Pricing" description="Prices are per unit and exclude tax." />
+        <PanelHeader title="Pricing" description="Prices are per unit and exclude tax." icon={Wallet} tone="emerald" />
         <div className="grid gap-4 p-4 md:grid-cols-4">
           <Field label="Purchase price" htmlFor="purchasePrice" required error={errors.purchasePrice?.message}>
             <Input id="purchasePrice" type="number" step="0.01" min="0" className="text-right" {...form.register("purchasePrice", num)} />
@@ -181,7 +182,18 @@ export function MedicineForm({ medicineId, defaults, categories }: MedicineFormP
             <Input id="taxPercent" type="number" step="0.01" min="0" max="100" className="text-right" {...form.register("taxPercent", num)} />
           </Field>
           <Field label="Margin">
-            <p className={margin !== null && margin < 0 ? "pt-1.5 text-[13px] text-red-600" : "pt-1.5 text-[13px] text-gray-700"}>
+            <p
+              className={cn(
+                "flex h-8 items-center justify-center rounded-lg text-[13px] font-bold tabular-nums",
+                margin === null || Number.isNaN(margin)
+                  ? "bg-slate-100 text-slate-400"
+                  : margin < 0
+                    ? "bg-red-100 text-red-700"
+                    : margin < 15
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-emerald-100 text-emerald-800"
+              )}
+            >
               {margin === null || Number.isNaN(margin) ? "-" : `${margin.toFixed(1)}%`}
             </p>
           </Field>
@@ -189,44 +201,58 @@ export function MedicineForm({ medicineId, defaults, categories }: MedicineFormP
       </Panel>
 
       <Panel>
-        <PanelHeader title="Stock control" />
+        <PanelHeader title="Stock control" description="Low stock alerts and where the medicine can be sold." icon={Boxes} tone="amber" />
         <div className="grid gap-4 p-4 md:grid-cols-3">
           <Field label="Reorder level" htmlFor="reorderLevel" required error={errors.reorderLevel?.message} hint="Flagged as low stock at or below this quantity.">
             <Input id="reorderLevel" type="number" step="1" min="0" className="text-right" {...form.register("reorderLevel", num)} />
           </Field>
-          <div className="space-y-3 pt-6">
-            <Controller
-              control={form.control}
-              name="prescriptionRequired"
-              render={({ field }) => (
-                <label className="flex items-center gap-2 text-[13px] text-gray-700">
-                  <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} />
-                  Prescription required to sell
-                </label>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="isActive"
-              render={({ field }) => (
-                <label className="flex items-center gap-2 text-[13px] text-gray-700">
-                  <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} />
-                  Active (available at POS)
-                </label>
-              )}
-            />
-          </div>
+          <Controller
+            control={form.control}
+            name="prescriptionRequired"
+            render={({ field }) => (
+              <label
+                className={cn(
+                  "flex cursor-pointer items-start gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] transition-colors md:mt-5",
+                  field.value ? "border-violet-300 bg-violet-50 text-violet-900" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                )}
+              >
+                <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} className="mt-0.5" />
+                <span>
+                  <span className="block font-semibold">Prescription required</span>
+                  <span className="text-xs opacity-75">The POS asks for a verified prescription.</span>
+                </span>
+              </label>
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="isActive"
+            render={({ field }) => (
+              <label
+                className={cn(
+                  "flex cursor-pointer items-start gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] transition-colors md:mt-5",
+                  field.value ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                )}
+              >
+                <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} className="mt-0.5" />
+                <span>
+                  <span className="block font-semibold">Active</span>
+                  <span className="text-xs opacity-75">Shown and sellable at the POS.</span>
+                </span>
+              </label>
+            )}
+          />
         </div>
       </Panel>
 
       <Panel>
-        <PanelHeader title="Image" />
+        <PanelHeader title="Image" description="Optional product photo." icon={ImageIcon} tone="violet" />
         <div className="flex items-center gap-4 p-4">
-          <div className="flex size-20 items-center justify-center overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+          <div className="flex size-20 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-violet-200 bg-violet-50/60">
             {imageUrl ? (
               <Image src={thumbnailUrl(imageUrl, 160)} alt="Medicine" width={80} height={80} className="size-20 object-cover" />
             ) : (
-              <ImageIcon className="size-6 text-gray-300" />
+              <ImageIcon className="size-6 text-violet-300" />
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -248,7 +274,7 @@ export function MedicineForm({ medicineId, defaults, categories }: MedicineFormP
               <Button
                 type="button"
                 variant="ghost"
-                className="text-gray-500"
+                className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                 onClick={() => {
                   form.setValue("imageUrl", "", { shouldDirty: true });
                   form.setValue("imagePublicId", "", { shouldDirty: true });
@@ -258,12 +284,12 @@ export function MedicineForm({ medicineId, defaults, categories }: MedicineFormP
                 Remove
               </Button>
             )}
-            <span className="text-xs text-gray-500">JPG, PNG or WEBP, up to 5 MB.</span>
+            <span className="text-xs text-slate-500">JPG, PNG or WEBP, up to 5 MB.</span>
           </div>
         </div>
       </Panel>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="sticky bottom-4 z-10 flex items-center justify-end gap-2 rounded-xl bg-white/90 p-3 shadow-lg ring-1 shadow-emerald-900/10 ring-slate-200 backdrop-blur">
         <Button type="button" variant="outline" asChild>
           <Link href={medicineId ? `/inventory/${medicineId}` : "/inventory"}>Cancel</Link>
         </Button>

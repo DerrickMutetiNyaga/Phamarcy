@@ -84,7 +84,7 @@ export function AddCategoryButton({ label = "Add category" }: { label?: string }
 export function CategoryRowActions({ category }: { category: { _id: string; name: string; description: string } }) {
   const router = useRouter();
   return (
-    <div className="flex justify-end gap-0.5">
+    <div className="flex justify-end gap-1">
       <CategoryDialog category={category} trigger={<EditIconButton />} />
       <DeleteIconButton
         title="Delete category?"

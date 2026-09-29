@@ -60,9 +60,9 @@ export function Topbar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
-              <p className="text-[13px] font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500">{user.email}</p>
-              <p className="mt-0.5 text-xs text-gray-500">{ROLE_LABELS[user.role]}</p>
+              <p className="text-[13px] font-medium text-slate-900">{user.name}</p>
+              <p className="text-xs text-slate-500">{user.email}</p>
+              <p className="mt-0.5 text-xs text-slate-500">{ROLE_LABELS[user.role]}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={signOut}>

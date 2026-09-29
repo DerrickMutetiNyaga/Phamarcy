@@ -6,9 +6,12 @@ export default function Loading() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {Array.from({ length: 5 }, (_, i) => (
-          <div key={i} className="rounded-md border border-gray-200 bg-white px-4 py-3">
-            <Skeleton className="h-3 w-24 bg-gray-100" />
-            <Skeleton className="mt-2 h-6 w-16 bg-gray-200" />
+          <div key={i} className="rounded-xl border border-slate-200/80 bg-gradient-to-br from-emerald-50 to-white px-4 py-3.5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <Skeleton className="h-3 w-24 bg-slate-200/70" />
+              <Skeleton className="size-9 rounded-xl bg-emerald-100" />
+            </div>
+            <Skeleton className="mt-1 h-7 w-20 bg-slate-200" />
           </div>
         ))}
       </div>

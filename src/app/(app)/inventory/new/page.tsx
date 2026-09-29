@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Panel } from "@/components/data/panel";
+import { EmptyState, Panel } from "@/components/data/panel";
 import { Button } from "@/components/ui/button";
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
 import { requireUser } from "@/server/auth";
@@ -13,11 +13,15 @@ export default async function NewMedicinePage() {
 
   if (categories.length === 0) {
     return (
-      <Panel className="max-w-lg px-6 py-8 text-center">
-        <p className="text-[13px] text-gray-600">Create a category before adding medicines.</p>
-        <Button asChild className="mt-4">
-          <Link href="/inventory/categories">Add your first category</Link>
-        </Button>
+      <Panel className="max-w-lg">
+        <EmptyState
+          message="Create a category before adding medicines."
+          action={
+            <Button asChild>
+              <Link href="/inventory/categories">Add your first category</Link>
+            </Button>
+          }
+        />
       </Panel>
     );
   }

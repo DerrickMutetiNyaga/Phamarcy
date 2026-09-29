@@ -4,6 +4,7 @@ import { ListToolbar } from "@/components/data/list-toolbar";
 import { Pagination } from "@/components/data/pagination";
 import { EmptyState, Panel, TABLE_SCROLL } from "@/components/data/panel";
 import { TableSkeleton } from "@/components/data/table-skeleton";
+import { InitialsAvatar } from "@/components/initials-avatar";
 import { AddPartyButton, PartyRowActions } from "@/components/party-actions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
@@ -49,16 +50,23 @@ async function SuppliersTable({ sp }: { sp: SearchParams }) {
           {result.rows.map((s) => (
             <TableRow key={s._id}>
               <TableCell>
-                <Link href={`/suppliers/${s._id}`} className="font-medium hover:text-emerald-700 hover:underline">
-                  {s.name}
+                <Link href={`/suppliers/${s._id}`} className="group inline-flex items-center gap-2.5 font-semibold text-slate-900">
+                  <InitialsAvatar name={s.name} className="rounded-lg" />
+                  <span className="group-hover:text-emerald-700 group-hover:underline">{s.name}</span>
                 </Link>
               </TableCell>
               <TableCell>{s.phone}</TableCell>
-              <TableCell className="text-gray-600">{s.email || "-"}</TableCell>
-              <TableCell className="max-w-60 truncate text-gray-600">{s.address || "-"}</TableCell>
-              <TableCell className="text-right tabular-nums">{s.purchaseCount}</TableCell>
-              <TableCell className="text-right tabular-nums">{money(s.totalPurchased)}</TableCell>
-              <TableCell className={cn("text-right tabular-nums", s.totalDue > 0 && "text-red-600")}>{money(s.totalDue)}</TableCell>
+              <TableCell className="text-slate-600">{s.email || "-"}</TableCell>
+              <TableCell className="max-w-60 truncate text-slate-600">{s.address || "-"}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                <span className="inline-flex min-w-8 justify-center rounded-full bg-teal-50 px-2 py-0.5 text-xs font-semibold text-teal-700 ring-1 ring-teal-100">
+                  {s.purchaseCount}
+                </span>
+              </TableCell>
+              <TableCell className="text-right font-medium tabular-nums">{money(s.totalPurchased)}</TableCell>
+              <TableCell className={cn("text-right font-semibold tabular-nums", s.totalDue > 0 ? "text-red-600" : "text-emerald-700")}>
+                {money(s.totalDue)}
+              </TableCell>
               <TableCell>
                 <PartyRowActions kind="supplier" party={s} />
               </TableCell>

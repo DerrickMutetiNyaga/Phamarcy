@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, ScanBarcode, Trash2 } from "lucide-react";
+import { CircleCheck, PackagePlus, Plus, ScanBarcode, Trash2, Truck, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -98,7 +98,7 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
     <form onSubmit={onSubmit} noValidate className="space-y-4">
       <FormError message={serverError} />
       <Panel>
-        <PanelHeader title="Purchase details" />
+        <PanelHeader title="Purchase details" description="Who delivered the stock and when." icon={Truck} tone="sky" />
         <div className="grid gap-4 p-4 md:grid-cols-4">
           <Field label="Supplier" required error={errors.supplier?.message}>
             <Controller
@@ -136,9 +136,11 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
         <PanelHeader
           title="Items"
           description="Each line creates a new batch, or adds to an existing batch with the same number and expiry."
+          icon={PackagePlus}
+          tone="teal"
           actions={
             <div className="relative w-64">
-              <ScanBarcode className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-gray-400" />
+              <ScanBarcode className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-teal-600" />
               <Input
                 value={scan}
                 onChange={(e) => setScan(e.target.value)}
@@ -174,7 +176,11 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
               const med = byId.get(items[i]?.medicine ?? "");
               return (
                 <TableRow key={f.id} className="align-top hover:bg-transparent">
-                  <TableCell className="pt-3.5 text-right text-gray-400 tabular-nums">{i + 1}</TableCell>
+                  <TableCell className="pt-3 text-right">
+                    <span className="inline-flex size-6 items-center justify-center rounded-full bg-teal-100 text-xs font-semibold text-teal-800 tabular-nums">
+                      {i + 1}
+                    </span>
+                  </TableCell>
                   <TableCell className="whitespace-normal">
                     <Controller
                       control={form.control}
@@ -188,7 +194,11 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
                         />
                       )}
                     />
-                    {med && <p className="mt-1 text-xs text-gray-500">Unit: {UNIT_LABELS[med.unit]}</p>}
+                    {med && (
+                      <p className="mt-1 inline-flex rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100">
+                        Unit: {UNIT_LABELS[med.unit]}
+                      </p>
+                    )}
                     {e?.medicine && <p className="mt-1 text-xs text-red-600">{e.medicine.message}</p>}
                   </TableCell>
                   <TableCell className="whitespace-normal">
@@ -221,14 +231,14 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
                     />
                     {e?.unitCost && <p className="mt-1 text-xs text-red-600">{e.unitCost.message}</p>}
                   </TableCell>
-                  <TableCell className="pt-3.5 text-right font-medium tabular-nums">{money(lineTotal(i))}</TableCell>
+                  <TableCell className="pt-3.5 text-right font-semibold text-slate-900 tabular-nums">{money(lineTotal(i))}</TableCell>
                   <TableCell className="pt-2">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon-sm"
                       aria-label="Remove line"
-                      className="text-gray-400 hover:text-red-600"
+                      className="bg-rose-50 text-rose-600 ring-1 ring-rose-100 hover:bg-rose-100 hover:text-rose-700"
                       disabled={fields.length === 1}
                       onClick={() => remove(i)}
                     >
@@ -240,8 +250,14 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
             })}
           </TableBody>
         </Table>
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-2.5">
-          <Button type="button" variant="outline" size="sm" onClick={() => append({ ...emptyLine })}>
+        <div className="flex items-center justify-between border-t border-teal-100 bg-teal-50/40 px-4 py-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-dashed border-teal-300 text-teal-700 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800"
+            onClick={() => append({ ...emptyLine })}
+          >
             <Plus className="size-3.5" />
             Add line
           </Button>
@@ -252,17 +268,18 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
 
       <div className="flex justify-end">
         <Panel className="w-full max-w-sm">
-          <dl className="space-y-2 px-4 py-3 text-[13px]">
+          <PanelHeader title="Payment summary" icon={Wallet} tone="emerald" />
+          <dl className="space-y-2.5 px-4 py-3 text-[13px]">
             <div className="flex justify-between">
-              <dt className="text-gray-500">Lines</dt>
-              <dd className="tabular-nums">{fields.length}</dd>
+              <dt className="text-slate-500">Lines</dt>
+              <dd className="font-medium tabular-nums">{fields.length}</dd>
             </div>
-            <div className="flex justify-between font-semibold text-gray-900">
-              <dt>Total</dt>
-              <dd className="tabular-nums">{money(total)}</dd>
+            <div className="flex items-center justify-between rounded-lg bg-gradient-to-r from-slate-900 to-emerald-950 px-3 py-2.5 text-white">
+              <dt className="text-xs font-medium text-emerald-200/90">Purchase total</dt>
+              <dd className="text-lg font-bold tabular-nums">{money(total)}</dd>
             </div>
             <div className="flex items-center justify-between gap-4 pt-1">
-              <dt className="text-gray-500">
+              <dt className="text-slate-600">
                 <label htmlFor="amountPaid">Amount paid now</label>
               </dt>
               <dd className="w-36">
@@ -278,8 +295,8 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
             </div>
             {errors.amountPaid && <p className="text-right text-xs text-red-600">{errors.amountPaid.message}</p>}
             <div className="flex items-center justify-between">
-              <dt className="text-gray-500">Balance due</dt>
-              <dd className="flex items-center gap-2 tabular-nums">
+              <dt className="text-slate-600">Balance due</dt>
+              <dd className={cn("flex items-center gap-2 font-semibold tabular-nums", total - paid > 0 ? "text-rose-600" : "text-emerald-700")}>
                 <PaymentStatusBadge status={paymentStatusFor(total, paid)} />
                 {money(round2(Math.max(0, total - paid)))}
               </dd>
@@ -287,14 +304,15 @@ export function PurchaseForm({ suppliers, medicines, defaults }: PurchaseFormPro
             <div className="flex justify-end pt-1">
               <button
                 type="button"
-                className="text-xs text-emerald-700 hover:underline"
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-100 hover:bg-emerald-100"
                 onClick={() => form.setValue("amountPaid", total, { shouldValidate: true })}
               >
+                <CircleCheck className="size-3.5" />
                 Mark as fully paid
               </button>
             </div>
           </dl>
-          <div className="flex justify-end gap-2 border-t border-gray-200 bg-gray-50 px-4 py-3">
+          <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3">
             <Button type="button" variant="outline" asChild>
               <Link href="/purchases">Cancel</Link>
             </Button>

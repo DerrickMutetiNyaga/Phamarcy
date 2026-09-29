@@ -1,7 +1,8 @@
-import { ArrowLeft, Plus } from "lucide-react";
+import { Contact, Plus, Truck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BackLink, DetailHero, HeroInitials } from "@/components/data/detail-hero";
 import { ListToolbar } from "@/components/data/list-toolbar";
 import { DetailGrid, EmptyState, Panel, PanelHeader } from "@/components/data/panel";
 import { TableSkeleton } from "@/components/data/table-skeleton";
@@ -45,27 +46,28 @@ export default async function SupplierDetailPage({
 
   return (
     <div className="space-y-4">
-      <Link href="/suppliers" className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="size-3.5" />
-        Suppliers
-      </Link>
+      <BackLink href="/suppliers" label="Suppliers" />
+      <DetailHero
+        media={<HeroInitials name={supplier.name} />}
+        eyebrow="Supplier"
+        title={supplier.name}
+        subtitle={supplier.phone}
+        actions={
+          <PartyRowActions
+            kind="supplier"
+            redirectTo="/suppliers"
+            party={{
+              _id: id,
+              name: supplier.name,
+              phone: supplier.phone,
+              email: supplier.email ?? "",
+              address: supplier.address ?? "",
+            }}
+          />
+        }
+      />
       <Panel>
-        <PanelHeader
-          title={supplier.name}
-          actions={
-            <PartyRowActions
-              kind="supplier"
-              redirectTo="/suppliers"
-              party={{
-                _id: id,
-                name: supplier.name,
-                phone: supplier.phone,
-                email: supplier.email ?? "",
-                address: supplier.address ?? "",
-              }}
-            />
-          }
-        />
+        <PanelHeader title="Contact details" icon={Contact} tone="sky" />
         <DetailGrid
           items={[
             { label: "Phone", value: supplier.phone },
@@ -97,7 +99,7 @@ export default async function SupplierDetailPage({
       </ListToolbar>
 
       <Panel>
-        <PanelHeader title="Purchase history" />
+        <PanelHeader title="Purchase history" icon={Truck} tone="teal" />
         <Suspense key={JSON.stringify(sp)} fallback={<TableSkeleton columns={8} rows={5} bare />}>
           <SupplierPurchases id={id} sp={sp} />
         </Suspense>

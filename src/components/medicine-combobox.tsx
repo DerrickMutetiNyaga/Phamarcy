@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Pill } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -36,10 +36,13 @@ export function MedicineCombobox({ options, value, onChange, placeholder = "Sele
           role="combobox"
           aria-expanded={open}
           aria-invalid={invalid}
-          className={cn("w-full justify-between font-normal", !selected && "text-gray-400")}
+          className={cn("w-full justify-between font-normal", selected ? "text-slate-900" : "text-slate-400")}
         >
-          <span className="truncate">{selected?.label ?? placeholder}</span>
-          <ChevronsUpDown className="size-3.5 text-gray-400" />
+          <span className="flex min-w-0 items-center gap-2">
+            <Pill className={cn("size-3.5 shrink-0", selected ? "text-emerald-600" : "text-slate-300")} />
+            <span className="truncate">{selected?.label ?? placeholder}</span>
+          </span>
+          <ChevronsUpDown className="size-3.5 text-slate-400" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="start">
@@ -58,8 +61,8 @@ export function MedicineCombobox({ options, value, onChange, placeholder = "Sele
                 }}
               >
                 <div className="min-w-0">
-                  <p className="truncate text-[13px]">{o.label}</p>
-                  {o.hint && <p className="truncate text-xs text-gray-500">{o.hint}</p>}
+                  <p className="truncate text-[13px] font-medium">{o.label}</p>
+                  {o.hint && <p className="truncate text-xs text-slate-500">{o.hint}</p>}
                 </div>
               </CommandItem>
             ))}

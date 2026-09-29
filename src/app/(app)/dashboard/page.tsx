@@ -1,65 +1,16 @@
-import { CalendarClock, FileClock, PackageMinus, Receipt, Wallet, type LucideIcon } from "lucide-react";
+import { CalendarClock, ChartColumn, FileClock, PackageMinus, Receipt, ShoppingBag, Wallet } from "lucide-react";
 import Link from "next/link";
+import { KpiCard as Stat } from "@/components/data/detail-hero";
 import { EmptyState, Panel, PanelHeader } from "@/components/data/panel";
 import { PaymentBadge, SaleStatusBadge, StockBadge } from "@/components/status-badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { canAccessPage } from "@/lib/auth/access";
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
 import { formatDateTime, formatMoney } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 import { getDashboardData } from "@/server/services/dashboard";
 import { getSettings } from "@/server/settings";
 import { RevenueChart } from "./revenue-chart";
-
-const STAT_TONES = {
-  emerald: { card: "from-emerald-50", icon: "bg-emerald-500 shadow-emerald-600/30", value: "text-emerald-950" },
-  sky: { card: "from-sky-50", icon: "bg-sky-500 shadow-sky-600/30", value: "text-sky-950" },
-  amber: { card: "from-amber-50", icon: "bg-amber-500 shadow-amber-600/30", value: "text-amber-700" },
-  rose: { card: "from-rose-50", icon: "bg-rose-500 shadow-rose-600/30", value: "text-rose-700" },
-  violet: { card: "from-violet-50", icon: "bg-violet-500 shadow-violet-600/30", value: "text-violet-700" },
-} as const;
-
-function Stat({
-  label,
-  value,
-  href,
-  icon: Icon,
-  tone,
-  note,
-}: {
-  label: string;
-  value: string;
-  href?: string;
-  icon: LucideIcon;
-  tone: keyof typeof STAT_TONES;
-  note?: string;
-}) {
-  const t = STAT_TONES[tone];
-  const body = (
-    <>
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-medium text-slate-600">{label}</p>
-        <span className={cn("flex size-9 items-center justify-center rounded-xl text-white shadow-md", t.icon)}>
-          <Icon className="size-4.5" />
-        </span>
-      </div>
-      <p className={cn("mt-1 text-2xl font-bold tracking-tight tabular-nums", t.value)}>{value}</p>
-      {note && <p className="mt-0.5 text-[11px] text-slate-500">{note}</p>}
-    </>
-  );
-  const className = cn(
-    "block rounded-xl border border-slate-200/80 bg-gradient-to-br to-white to-60% px-4 py-3.5 shadow-sm transition-all",
-    t.card
-  );
-  return href ? (
-    <Link href={href} className={cn(className, "hover:-translate-y-0.5 hover:shadow-md")}>
-      {body}
-    </Link>
-  ) : (
-    <div className={className}>{body}</div>
-  );
-}
 
 export default async function DashboardPage() {
   const user = await requireUser(INVENTORY_ROLES);
@@ -107,13 +58,15 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 xl:grid-cols-3">
         <Panel className="xl:col-span-2">
-          <PanelHeader title="Revenue, last 14 days" description="Completed sales including tax" />
+          <PanelHeader title="Revenue, last 14 days" description="Completed sales including tax" icon={ChartColumn} tone="emerald" />
           <RevenueChart data={data.revenueByDay} />
         </Panel>
 
         <Panel>
           <PanelHeader
             title="Low stock"
+            icon={PackageMinus}
+            tone="amber"
             actions={
               <Link href="/inventory?stock=low" className="text-xs text-emerald-700 hover:underline">
                 View all
@@ -145,7 +98,7 @@ export default async function DashboardPage() {
                       </span>
                       {m.stock}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-gray-500">{m.reorderLevel}</TableCell>
+                    <TableCell className="text-right tabular-nums text-slate-500">{m.reorderLevel}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -157,6 +110,8 @@ export default async function DashboardPage() {
       <Panel>
         <PanelHeader
           title="Recent sales"
+          icon={ShoppingBag}
+          tone="sky"
           actions={
             canOpenSales ? (
               <Link href="/sales" className="text-xs text-emerald-700 hover:underline">
@@ -193,12 +148,12 @@ export default async function DashboardPage() {
                       s.invoiceNo
                     )}
                   </TableCell>
-                  <TableCell className="text-gray-600">{formatDateTime(s.createdAt)}</TableCell>
+                  <TableCell className="text-slate-600">{formatDateTime(s.createdAt)}</TableCell>
                   <TableCell>{s.customerName}</TableCell>
                   <TableCell>
                     <PaymentBadge method={s.paymentMethod} />
                   </TableCell>
-                  <TableCell className="text-gray-600">{s.soldByName}</TableCell>
+                  <TableCell className="text-slate-600">{s.soldByName}</TableCell>
                   <TableCell className="text-right tabular-nums">{s.itemCount}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(s.grandTotal)}</TableCell>
                   <TableCell>

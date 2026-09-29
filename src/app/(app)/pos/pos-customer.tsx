@@ -99,14 +99,14 @@ export function PosCustomerPicker({ customer, onChange }: { customer: PosCustome
       </div>
       {state === "notfound" ? (
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">No customer with this phone.</span>
+          <span className="text-slate-500">No customer with this phone.</span>
           <button type="button" className="inline-flex items-center gap-1 text-emerald-700 hover:underline" onClick={() => setAddOpen(true)}>
             <UserPlus className="size-3.5" />
             Add customer
           </button>
         </div>
       ) : (
-        <p className="text-xs text-gray-400">Walk-in sale if no customer is selected.</p>
+        <p className="text-xs text-slate-400">Walk-in sale if no customer is selected.</p>
       )}
       <PartyDialog
         kind="customer"

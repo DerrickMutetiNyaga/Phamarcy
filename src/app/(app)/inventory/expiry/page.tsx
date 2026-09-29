@@ -1,5 +1,7 @@
+import { Boxes, CalendarX, Coins, Info, Layers } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { KpiCard } from "@/components/data/detail-hero";
 import { ListToolbar } from "@/components/data/list-toolbar";
 import { EmptyState, Panel, TABLE_SCROLL } from "@/components/data/panel";
 import { TableSkeleton } from "@/components/data/table-skeleton";
@@ -30,7 +32,24 @@ async function ExpiryTable({ sp }: { sp: SearchParams }) {
     );
   }
 
+  const expired = rows.filter((r) => r.daysLeft <= 0);
+  const units = rows.reduce((s, r) => s + r.quantity, 0);
+  const value = round2(rows.reduce((s, r) => s + r.costValue, 0));
+
   return (
+    <>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <KpiCard label="Batches listed" value={rows.length.toLocaleString("en-US")} icon={Layers} tone="sky" note={EXPIRY_WINDOW_LABELS[window]} />
+        <KpiCard label="Units at risk" value={units.toLocaleString("en-US")} icon={Boxes} tone="amber" note="Stock on hand" />
+        <KpiCard label="Value at cost" value={money(value)} icon={Coins} tone="rose" note="Potential write-off" />
+        <KpiCard
+          label="Already expired"
+          value={expired.length.toLocaleString("en-US")}
+          icon={CalendarX}
+          tone={expired.length > 0 ? "rose" : "emerald"}
+          note={expired.length > 0 ? "Batches to write off" : "Nothing expired"}
+        />
+      </div>
     <Panel>
       <Table containerClassName={TABLE_SCROLL}>
         <TableHeader>
@@ -58,7 +77,14 @@ async function ExpiryTable({ sp }: { sp: SearchParams }) {
                 {r.daysLeft <= 0 ? (
                   <Badge variant="danger">Expired</Badge>
                 ) : (
-                  <span className={cn(r.daysLeft <= 30 ? "text-red-600" : r.daysLeft <= 60 ? "text-amber-700" : "")}>{r.daysLeft}</span>
+                  <span
+                    className={cn(
+                      "inline-flex min-w-10 justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                      r.daysLeft <= 30 ? "bg-red-100 text-red-700" : r.daysLeft <= 60 ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                    )}
+                  >
+                    {r.daysLeft}
+                  </span>
                 )}
               </TableCell>
               <TableCell className="text-right tabular-nums">{r.quantity}</TableCell>
@@ -70,13 +96,14 @@ async function ExpiryTable({ sp }: { sp: SearchParams }) {
         <TableFooter>
           <TableRow className="hover:bg-transparent">
             <TableCell colSpan={4}>{rows.length} batches</TableCell>
-            <TableCell className="text-right tabular-nums">{rows.reduce((s, r) => s + r.quantity, 0)}</TableCell>
+            <TableCell className="text-right tabular-nums">{units}</TableCell>
             <TableCell />
-            <TableCell className="text-right tabular-nums">{money(round2(rows.reduce((s, r) => s + r.costValue, 0)))}</TableCell>
+            <TableCell className="text-right tabular-nums">{money(value)}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>
     </Panel>
+    </>
   );
 }
 
@@ -97,7 +124,8 @@ export default async function ExpiryPage({ searchParams }: { searchParams: Promi
           },
         ]}
       />
-      <p className="text-xs text-gray-500">
+      <p className="flex items-center gap-2 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-900 ring-1 ring-sky-100">
+        <Info className="size-4 shrink-0 text-sky-600" />
         Only batches with stock on hand are listed. To write off expired stock, open the medicine and adjust the batch.
       </p>
       <Suspense key={JSON.stringify(sp)} fallback={<TableSkeleton columns={7} />}>

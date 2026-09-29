@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiFetch, errorMessage } from "@/lib/client/api";
 import { ROLE_LABELS, ROLES, type Role } from "@/lib/auth/roles";
+import { cn } from "@/lib/utils";
 import { userCreateSchema, userUpdateSchema } from "@/lib/validators/auth";
 
 export interface UserValues {
@@ -31,6 +32,12 @@ const ROLE_HINTS: Record<Role, string> = {
   cashier: "Point of sale, customers and their own sales.",
 };
 
+const ROLE_DOTS: Record<Role, string> = {
+  admin: "bg-violet-500",
+  pharmacist: "bg-sky-500",
+  cashier: "bg-amber-500",
+};
+
 function RoleSelect({ value, onChange, invalid }: { value: Role; onChange: (r: Role) => void; invalid: boolean }) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as Role)}>
@@ -40,6 +47,7 @@ function RoleSelect({ value, onChange, invalid }: { value: Role; onChange: (r: R
       <SelectContent position="popper">
         {ROLES.map((r) => (
           <SelectItem key={r} value={r}>
+            <span className={cn("size-2 rounded-full", ROLE_DOTS[r])} />
             {ROLE_LABELS[r]}
           </SelectItem>
         ))}
@@ -193,7 +201,15 @@ export function ToggleActiveButton({ user, isSelf }: { user: UserValues; isSelf:
   return (
     <ConfirmDialog
       trigger={
-        <Button variant="ghost" size="sm" className={next ? "text-emerald-700" : "text-red-600 hover:text-red-700"}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={
+            next
+              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100 hover:bg-emerald-100 hover:text-emerald-800"
+              : "bg-rose-50 text-rose-600 ring-1 ring-rose-100 hover:bg-rose-100 hover:text-rose-700"
+          }
+        >
           {next ? "Activate" : "Deactivate"}
         </Button>
       }

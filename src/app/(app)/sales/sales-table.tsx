@@ -40,19 +40,21 @@ export function SalesTable({
                   {s.invoiceNo}
                 </Link>
               </TableCell>
-              <TableCell className="text-gray-600">{formatDateTime(s.createdAt)}</TableCell>
+              <TableCell className="text-slate-600">{formatDateTime(s.createdAt)}</TableCell>
               {showCustomer && (
                 <TableCell>
                   {s.customerName}
-                  {s.customerPhone && <span className="ml-1.5 text-xs text-gray-500">{s.customerPhone}</span>}
+                  {s.customerPhone && <span className="ml-1.5 text-xs text-slate-500">{s.customerPhone}</span>}
                 </TableCell>
               )}
               <TableCell>
                 <PaymentBadge method={s.paymentMethod} />
               </TableCell>
-              <TableCell className="text-gray-600">{s.soldByName}</TableCell>
-              <TableCell className="text-right tabular-nums">{s.itemCount}</TableCell>
-              <TableCell className={cn("text-right tabular-nums", s.status === "refunded" && "text-gray-400 line-through")}>
+              <TableCell className="text-slate-600">{s.soldByName}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                <span className="inline-flex min-w-7 justify-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">{s.itemCount}</span>
+              </TableCell>
+              <TableCell className={cn("text-right font-semibold tabular-nums", s.status === "refunded" ? "text-slate-400 line-through" : "text-emerald-800")}>
                 {money(s.grandTotal)}
               </TableCell>
               <TableCell>

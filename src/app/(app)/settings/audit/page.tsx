@@ -3,6 +3,8 @@ import { ListToolbar } from "@/components/data/list-toolbar";
 import { Pagination } from "@/components/data/pagination";
 import { EmptyState, Panel } from "@/components/data/panel";
 import { TableSkeleton } from "@/components/data/table-skeleton";
+import { InitialsAvatar } from "@/components/initials-avatar";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDateTime } from "@/lib/format";
 import { dateRangeParam, pageParam, param, type SearchParams } from "@/server/query";
@@ -10,6 +12,14 @@ import { AUDIT_ENTITIES, listAuditLogs } from "@/server/services/audit-log";
 
 function label(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function actionVariant(action: string): React.ComponentProps<typeof Badge>["variant"] {
+  if (/delete|refund|deactivate|reject/.test(action)) return "danger";
+  if (/create|add|verify|activate|payment/.test(action)) return "success";
+  if (/update|edit|adjust|review/.test(action)) return "info";
+  if (/login|logout|sign/.test(action)) return "rx";
+  return "outline";
 }
 
 async function AuditTable({ sp }: { sp: SearchParams }) {
@@ -41,11 +51,20 @@ async function AuditTable({ sp }: { sp: SearchParams }) {
         <TableBody>
           {result.rows.map((r) => (
             <TableRow key={r._id}>
-              <TableCell className="text-gray-600 tabular-nums">{formatDateTime(r.timestamp)}</TableCell>
-              <TableCell>{r.userName}</TableCell>
-              <TableCell>{label(r.action.replaceAll("_", " "))}</TableCell>
-              <TableCell>{label(r.entity)}</TableCell>
-              <TableCell className="max-w-xl truncate text-gray-600" title={r.details}>
+              <TableCell className="text-slate-600 tabular-nums">{formatDateTime(r.timestamp)}</TableCell>
+              <TableCell>
+                <span className="inline-flex items-center gap-2 font-medium text-slate-900">
+                  <InitialsAvatar name={r.userName || "?"} className="size-6 text-[9px]" />
+                  {r.userName}
+                </span>
+              </TableCell>
+              <TableCell>
+                <Badge variant={actionVariant(r.action)}>{label(r.action.replaceAll("_", " "))}</Badge>
+              </TableCell>
+              <TableCell>
+                <span className="text-[13px] font-medium text-slate-700">{label(r.entity)}</span>
+              </TableCell>
+              <TableCell className="max-w-xl truncate text-slate-600" title={r.details}>
                 {r.details || "-"}
               </TableCell>
             </TableRow>

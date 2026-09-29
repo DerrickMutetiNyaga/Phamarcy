@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { ROLE_LABELS, type Role } from "@/lib/auth/roles";
 import { daysUntil } from "@/lib/format";
 import type { PrescriptionStatus } from "@/lib/validators/prescription";
 import type { PaymentStatus } from "@/lib/validators/purchase";
@@ -25,6 +26,11 @@ export function PaymentBadge({ method }: { method: PaymentMethod }) {
     return <Badge className="border-mpesa/30 bg-mpesa/10 font-extrabold tracking-tight text-mpesa">M-PESA</Badge>;
   if (method === "card") return <Badge variant="info">{PAYMENT_METHOD_LABELS[method]}</Badge>;
   return <Badge variant="warning">{PAYMENT_METHOD_LABELS[method]}</Badge>;
+}
+
+export function RoleBadge({ role }: { role: Role }) {
+  const variant = role === "admin" ? "rx" : role === "pharmacist" ? "info" : "warning";
+  return <Badge variant={variant}>{ROLE_LABELS[role]}</Badge>;
 }
 
 export function RxBadge() {

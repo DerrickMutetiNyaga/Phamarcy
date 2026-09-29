@@ -1,6 +1,7 @@
-import { ArrowLeft } from "lucide-react";
+import { BadgePercent, FileText, Info, Landmark, Pill, Receipt, ShoppingBag, Undo2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BackLink, DetailHero, KpiCard } from "@/components/data/detail-hero";
 import { DetailGrid, Panel, PanelHeader } from "@/components/data/panel";
 import { PaymentBadge, PrescriptionStatusBadge, SaleStatusBadge } from "@/components/status-badge";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -20,24 +21,46 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
   const money = (v: number) => formatMoney(v, settings.currencySymbol);
   const change = sale.amountTendered !== null && sale.amountTendered !== undefined ? round2(sale.amountTendered - sale.grandTotal) : null;
   const refundable = user.role === "admin" && sale.status === "completed";
+  const itemQty = sale.items.reduce((s, i) => s + i.quantity, 0);
 
   return (
     <div className="space-y-4">
-      <Link href="/sales" className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="size-3.5" />
-        Sales history
-      </Link>
+      <BackLink href="/sales" label="Sales history" />
+
+      <DetailHero
+        icon={Receipt}
+        eyebrow="Invoice"
+        title={sale.invoiceNo}
+        subtitle={`${formatDateTime(sale.createdAt)} · ${sale.customerName}`}
+        badges={
+          <>
+            <SaleStatusBadge status={sale.status} />
+            <PaymentBadge method={sale.paymentMethod} />
+          </>
+        }
+        actions={
+          <>
+            <ReprintButton saleId={id} />
+            {refundable && <RefundDialog saleId={id} invoiceNo={sale.invoiceNo} total={money(sale.grandTotal)} />}
+          </>
+        }
+      />
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <KpiCard
+          label="Grand total"
+          value={money(sale.grandTotal)}
+          icon={Wallet}
+          tone={sale.status === "refunded" ? "rose" : "emerald"}
+          note={sale.status === "refunded" ? "Refunded" : `Subtotal ${money(sale.subtotal)}`}
+        />
+        <KpiCard label="Units sold" value={itemQty.toLocaleString("en-US")} icon={ShoppingBag} tone="sky" note={`${sale.items.length} lines`} />
+        <KpiCard label="Discounts" value={money(sale.discountTotal)} icon={BadgePercent} tone="amber" note={sale.billDiscount > 0 ? `Bill ${money(sale.billDiscount)}` : "Line discounts"} />
+        <KpiCard label="Tax" value={money(sale.taxTotal)} icon={Landmark} tone="violet" note="Included in total" />
+      </div>
 
       <Panel>
-        <PanelHeader
-          title={`Invoice ${sale.invoiceNo}`}
-          actions={
-            <div className="flex items-center gap-2">
-              <ReprintButton saleId={id} />
-              {refundable && <RefundDialog saleId={id} invoiceNo={sale.invoiceNo} total={money(sale.grandTotal)} />}
-            </div>
-          }
-        />
+        <PanelHeader title="Sale details" icon={Info} tone="sky" />
         <DetailGrid
           items={[
             { label: "Date", value: formatDateTime(sale.createdAt) },
@@ -60,7 +83,8 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
           ]}
         />
         {sale.status === "refunded" && (
-          <p className="border-t border-gray-100 bg-red-50/50 px-4 py-2.5 text-[13px] text-red-700">
+          <p className="flex items-center gap-2 border-t border-red-100 bg-red-50 px-4 py-2.5 text-[13px] font-medium text-red-700">
+            <Undo2 className="size-4 shrink-0" />
             Refunded {sale.refundedAt ? formatDateTime(sale.refundedAt) : ""} by {sale.refundedBy?.name ?? "unknown"}: {sale.refundReason}
           </p>
         )}
@@ -68,7 +92,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
 
       {sale.prescription && (
         <Panel>
-          <PanelHeader title="Prescription" />
+          <PanelHeader title="Prescription" icon={FileText} tone="violet" />
           <div className="flex items-center gap-4 px-4 py-3 text-[13px]">
             <a href={sale.prescription.imageUrl} target="_blank" rel="noreferrer" className="text-emerald-700 hover:underline">
               {sale.prescription.customerName}, uploaded {formatDate(sale.prescription.createdAt)}
@@ -79,7 +103,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
       )}
 
       <Panel>
-        <PanelHeader title="Items" />
+        <PanelHeader title="Items" icon={Pill} tone="emerald" />
         <Table>
           <TableHeader>
             <TableRow>
@@ -104,7 +128,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
                 <TableCell className="text-right tabular-nums">{money(item.discount)}</TableCell>
                 <TableCell className="text-right tabular-nums">
                   {money(item.tax)}
-                  <span className="ml-1 text-xs text-gray-400">({item.taxPercent}%)</span>
+                  <span className="ml-1 text-xs text-slate-400">({item.taxPercent}%)</span>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">{money(item.total)}</TableCell>
               </TableRow>
@@ -114,9 +138,9 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={3}>
                 Subtotal {money(sale.subtotal)}
-                {sale.billDiscount > 0 && <span className="ml-3 font-normal text-gray-500">incl. bill discount {money(sale.billDiscount)}</span>}
+                {sale.billDiscount > 0 && <span className="ml-3 font-normal text-slate-500">incl. bill discount {money(sale.billDiscount)}</span>}
               </TableCell>
-              <TableCell className="text-right tabular-nums">{sale.items.reduce((s, i) => s + i.quantity, 0)}</TableCell>
+              <TableCell className="text-right tabular-nums">{itemQty}</TableCell>
               <TableCell />
               <TableCell className="text-right tabular-nums">{money(sale.discountTotal)}</TableCell>
               <TableCell className="text-right tabular-nums">{money(sale.taxTotal)}</TableCell>

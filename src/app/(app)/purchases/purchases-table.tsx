@@ -41,7 +41,7 @@ export function PurchasesTable({
                   {p.purchaseNo}
                 </Link>
               </TableCell>
-              <TableCell className="text-gray-600">{formatDate(p.date)}</TableCell>
+              <TableCell className="text-slate-600">{formatDate(p.date)}</TableCell>
               {showSupplier && (
                 <TableCell>
                   <Link href={`/suppliers/${p.supplierId}`} className="hover:text-emerald-700 hover:underline">
@@ -49,11 +49,11 @@ export function PurchasesTable({
                   </Link>
                 </TableCell>
               )}
-              <TableCell className="text-gray-600">{p.supplierInvoiceNo || "-"}</TableCell>
+              <TableCell className="text-slate-600">{p.supplierInvoiceNo || "-"}</TableCell>
               <TableCell className="text-right tabular-nums">{p.itemCount}</TableCell>
-              <TableCell className="text-right tabular-nums">{money(p.total)}</TableCell>
-              <TableCell className="text-right tabular-nums">{money(p.amountPaid)}</TableCell>
-              <TableCell className={cn("text-right tabular-nums", p.due > 0 && "text-red-600")}>{money(p.due)}</TableCell>
+              <TableCell className="text-right font-semibold text-slate-900 tabular-nums">{money(p.total)}</TableCell>
+              <TableCell className="text-right text-emerald-700 tabular-nums">{money(p.amountPaid)}</TableCell>
+              <TableCell className={cn("text-right font-semibold tabular-nums", p.due > 0 ? "text-red-600" : "text-slate-400")}>{money(p.due)}</TableCell>
               <TableCell>
                 <PaymentStatusBadge status={p.paymentStatus} />
               </TableCell>

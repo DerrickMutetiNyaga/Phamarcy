@@ -1,7 +1,10 @@
+import { UsersRound } from "lucide-react";
 import { Panel, PanelHeader, TABLE_SCROLL } from "@/components/data/panel";
+import { InitialsAvatar } from "@/components/initials-avatar";
+import { RoleBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ADMIN_ONLY, ROLE_LABELS } from "@/lib/auth/roles";
+import { ADMIN_ONLY } from "@/lib/auth/roles";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
@@ -14,7 +17,13 @@ export default async function UsersPage() {
 
   return (
     <Panel>
-      <PanelHeader title="Users" description="Staff accounts that can sign in to the system." actions={<AddUserButton />} />
+      <PanelHeader
+        title="Users"
+        description="Staff accounts that can sign in to the system."
+        icon={UsersRound}
+        tone="indigo"
+        actions={<AddUserButton />}
+      />
       <Table containerClassName={TABLE_SCROLL}>
         <TableHeader>
           <TableRow>
@@ -33,16 +42,23 @@ export default async function UsersPage() {
             const isSelf = id === me.id;
             const values = { _id: id, name: u.name, email: u.email, role: u.role, isActive: u.isActive };
             return (
-              <TableRow key={id} className={cn(!u.isActive && "text-gray-400")}>
-                <TableCell className="font-medium">
-                  {u.name}
-                  {isSelf && <span className="ml-1.5 text-xs font-normal text-gray-500">(you)</span>}
+              <TableRow key={id} className={cn(!u.isActive && "text-slate-400")}>
+                <TableCell className="font-semibold text-slate-900">
+                  <span className={cn("inline-flex items-center gap-2.5", !u.isActive && "opacity-50")}>
+                    <InitialsAvatar name={u.name} />
+                    {u.name}
+                    {isSelf && (
+                      <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800">You</span>
+                    )}
+                  </span>
                 </TableCell>
                 <TableCell>{u.email}</TableCell>
-                <TableCell>{ROLE_LABELS[u.role]}</TableCell>
+                <TableCell>
+                  <RoleBadge role={u.role} />
+                </TableCell>
                 <TableCell>{u.isActive ? <Badge variant="success">Active</Badge> : <Badge variant="outline">Inactive</Badge>}</TableCell>
-                <TableCell className="text-gray-600">{u.lastLoginAt ? formatDateTime(u.lastLoginAt) : "Never"}</TableCell>
-                <TableCell className="text-gray-600">{formatDate(u.createdAt)}</TableCell>
+                <TableCell className="text-slate-600">{u.lastLoginAt ? formatDateTime(u.lastLoginAt) : "Never"}</TableCell>
+                <TableCell className="text-slate-600">{formatDate(u.createdAt)}</TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-1">
                     <ToggleActiveButton user={values} isSelf={isSelf} />
