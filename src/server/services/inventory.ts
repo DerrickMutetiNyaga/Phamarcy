@@ -181,6 +181,8 @@ export interface PosMedicine {
   salePrice: number;
   taxPercent: number;
   prescriptionRequired: boolean;
+  categoryName: string;
+  reorderLevel: number;
   stock: number;
   nearestExpiry: string | null;
 }
@@ -208,6 +210,8 @@ export async function searchSellable(q: string, limit = 20): Promise<PosMedicine
     salePrice: r.salePrice,
     taxPercent: r.taxPercent,
     prescriptionRequired: r.prescriptionRequired,
+    categoryName: r.categoryName,
+    reorderLevel: r.reorderLevel,
     stock: r.stock,
     nearestExpiry: r.nearestExpiry,
   }));

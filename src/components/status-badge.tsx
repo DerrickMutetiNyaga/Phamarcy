@@ -22,7 +22,7 @@ export function PrescriptionStatusBadge({ status }: { status: PrescriptionStatus
 
 export function RxBadge() {
   return (
-    <Badge variant="outline" className="border-amber-300 text-amber-700" title="Prescription required">
+    <Badge variant="rx" title="Prescription required">
       Rx
     </Badge>
   );

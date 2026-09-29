@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Upload, X } from "lucide-react";
+import { FileWarning, Search, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { PrescriptionUploadDialog } from "@/components/prescription-upload-dialog";
@@ -59,14 +59,17 @@ export function PrescriptionPanel({ rxItemNames, attached, onAttach, customerNam
   if (rxItemNames.length === 0 && !attached) return null;
 
   return (
-    <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5">
+    <div className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2.5">
       {rxItemNames.length > 0 && (
-        <p className="text-xs text-amber-800">
-          <span className="font-medium">Prescription required</span> for {rxItemNames.join(", ")}.
+        <p className="flex items-start gap-1.5 text-xs text-violet-900">
+          <FileWarning className="mt-px size-3.5 shrink-0 text-violet-600" />
+          <span>
+            <span className="font-semibold">Prescription required</span> for {rxItemNames.join(", ")}.
+          </span>
         </p>
       )}
       {attached ? (
-        <div className="mt-2 flex items-center justify-between rounded border border-amber-200 bg-white px-2.5 py-1.5">
+        <div className="mt-2 flex items-center justify-between rounded-md border border-violet-200 bg-white px-2.5 py-1.5">
           <div className="min-w-0 text-xs">
             <p className="truncate font-medium text-gray-900">
               {attached.customerName} <span className="font-normal text-gray-500">{attached.phone}</span>
@@ -86,7 +89,7 @@ export function PrescriptionPanel({ rxItemNames, attached, onAttach, customerNam
           }}
         >
           <DialogTrigger asChild>
-            <Button size="sm" variant="outline" className="mt-2 w-full border-amber-300 bg-white">
+            <Button size="sm" variant="outline" className="mt-2 w-full border-violet-300 text-violet-800 hover:border-violet-400 hover:bg-violet-100 hover:text-violet-900">
               Attach verified prescription
             </Button>
           </DialogTrigger>

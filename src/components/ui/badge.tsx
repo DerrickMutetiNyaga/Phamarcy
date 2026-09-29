@@ -4,15 +4,17 @@ import { cn } from "cn"
 import { Slot } from "radix-ui"
 
 const badgeVariants = cva(
-  "inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded border px-1.5 text-[11px] font-medium whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3!",
+  "inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border px-2 text-[11px] font-semibold whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3!",
   {
     variants: {
       variant: {
-        default: "border-gray-200 bg-gray-100 text-gray-700",
-        success: "border-emerald-200 bg-emerald-50 text-emerald-700",
-        warning: "border-amber-200 bg-amber-50 text-amber-700",
-        danger: "border-red-200 bg-red-50 text-red-700",
-        outline: "border-gray-300 bg-white text-gray-700",
+        default: "border-slate-200 bg-slate-100 text-slate-700",
+        success: "border-emerald-200 bg-emerald-100/70 text-emerald-800",
+        warning: "border-amber-200 bg-amber-100/70 text-amber-800",
+        danger: "border-red-200 bg-red-100/70 text-red-700",
+        info: "border-sky-200 bg-sky-100/70 text-sky-800",
+        rx: "border-violet-200 bg-violet-100/70 text-violet-700",
+        outline: "border-slate-300 bg-white text-slate-700",
       },
     },
     defaultVariants: {

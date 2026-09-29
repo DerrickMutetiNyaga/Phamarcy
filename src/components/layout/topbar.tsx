@@ -39,18 +39,24 @@ export function Topbar() {
     .toUpperCase();
 
   return (
-    <header className="no-print sticky top-0 z-20 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
-      <h1 className="text-[15px] font-semibold text-gray-900">{titleForPath(pathname)}</h1>
+    <header className="no-print sticky top-0 z-20 flex h-14 items-center justify-between border-b border-emerald-900/10 bg-white/85 px-6 backdrop-blur">
+      <div className="flex items-center gap-3">
+        <span className="h-6 w-1 rounded-full bg-gradient-to-b from-emerald-500 to-teal-500" />
+        <h1 className="text-base font-semibold text-slate-900">{titleForPath(pathname)}</h1>
+      </div>
       <div className="flex items-center gap-4">
-        <span className="hidden text-[13px] text-gray-500 md:inline">{settings.pharmacyName}</span>
-        <span className="h-5 w-px bg-gray-200" />
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-1.5 py-1 text-[13px] text-gray-700 outline-none hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-emerald-600/40">
-            <span className="flex size-7 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-[11px] font-medium text-gray-700">
+          <DropdownMenuTrigger className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 text-[13px] text-slate-700 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-600/40">
+            <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-[11px] font-semibold text-white shadow-sm">
               {initials}
             </span>
-            <span className="hidden sm:inline">{user.name}</span>
-            <ChevronDown className="size-3.5 text-gray-400" />
+            <span className="hidden text-left leading-tight sm:block">
+              <span className="block font-medium text-slate-900">{user.name}</span>
+              <span className="block text-[11px] text-slate-500">
+                {ROLE_LABELS[user.role]} · {settings.pharmacyName}
+              </span>
+            </span>
+            <ChevronDown className="size-3.5 text-slate-400" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">

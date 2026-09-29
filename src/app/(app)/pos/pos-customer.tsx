@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, UserPlus, X } from "lucide-react";
+import { Search, UserPlus, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PartyDialog } from "@/components/party-dialog";
@@ -43,12 +43,26 @@ export function PosCustomerPicker({ customer, onChange }: { customer: PosCustome
 
   if (customer) {
     return (
-      <div className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2">
-        <div className="min-w-0">
-          <p className="truncate text-[13px] font-medium text-gray-900">{customer.name}</p>
-          <p className="text-xs text-gray-500 tabular-nums">{customer.phone}</p>
+      <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-[11px] font-semibold text-white">
+          {customer.name
+            .split(/\s+/)
+            .map((p) => p[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase()}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-semibold text-emerald-950">{customer.name}</p>
+          <p className="text-xs text-emerald-700 tabular-nums">{customer.phone}</p>
         </div>
-        <Button variant="ghost" size="icon-sm" aria-label="Remove customer" onClick={() => onChange(null)} className="text-gray-500">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Remove customer"
+          onClick={() => onChange(null)}
+          className="text-emerald-700 hover:bg-emerald-100"
+        >
           <X className="size-3.5" />
         </Button>
       </div>
@@ -58,23 +72,27 @@ export function PosCustomerPicker({ customer, onChange }: { customer: PosCustome
   return (
     <div className="space-y-1.5">
       <div className="flex gap-2">
-        <Input
-          type="tel"
-          value={phone}
-          placeholder="Customer phone (optional)"
-          onChange={(e) => {
-            setPhone(e.target.value);
-            if (state === "notfound") setState("idle");
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              void lookup();
-            }
-          }}
-          aria-label="Customer phone"
-        />
-        <Button variant="outline" onClick={lookup} disabled={state === "loading"}>
+        <div className="relative flex-1">
+          <UserRound className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            type="tel"
+            value={phone}
+            className="h-9 pl-8"
+            placeholder="Customer phone (optional)"
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (state === "notfound") setState("idle");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void lookup();
+              }
+            }}
+            aria-label="Customer phone"
+          />
+        </div>
+        <Button variant="outline" className="h-9" onClick={lookup} disabled={state === "loading"}>
           <Search className="size-4" />
           Find
         </Button>

@@ -8,15 +8,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-emerald-600 text-white hover:bg-emerald-700",
+        default:
+          "bg-gradient-to-b from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-700/20 hover:from-emerald-600 hover:to-emerald-700",
         outline:
-          "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 aria-expanded:bg-gray-50",
+          "border-slate-300 bg-white text-slate-700 shadow-xs hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 aria-expanded:bg-emerald-50",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
-          "bg-red-600 text-white hover:bg-red-700 focus-visible:border-red-600 focus-visible:ring-red-600/20",
+          "bg-gradient-to-b from-red-500 to-red-600 text-white shadow-sm shadow-red-700/20 hover:from-red-600 hover:to-red-700 focus-visible:border-red-600 focus-visible:ring-red-600/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
