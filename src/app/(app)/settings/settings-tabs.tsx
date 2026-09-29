@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { NAV_TABS_CLASS, navTabClass } from "@/components/data/nav-tabs";
 
 const TABS = [
   { href: "/settings", label: "General" },
@@ -13,16 +13,9 @@ const TABS = [
 export function SettingsTabs() {
   const pathname = usePathname();
   return (
-    <nav className="flex gap-1 border-b border-gray-200" aria-label="Settings">
+    <nav className={NAV_TABS_CLASS} aria-label="Settings">
       {TABS.map((t) => (
-        <Link
-          key={t.href}
-          href={t.href}
-          className={cn(
-            "-mb-px border-b-2 px-3 py-2 text-[13px] font-medium",
-            pathname === t.href ? "border-emerald-600 text-emerald-700" : "border-transparent text-gray-500 hover:text-gray-900"
-          )}
-        >
+        <Link key={t.href} href={t.href} className={navTabClass(pathname === t.href)}>
           {t.label}
         </Link>
       ))}

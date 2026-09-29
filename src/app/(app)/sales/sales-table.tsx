@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { Pagination } from "@/components/data/pagination";
 import { TABLE_SCROLL } from "@/components/data/panel";
-import { SaleStatusBadge } from "@/components/status-badge";
+import { PaymentBadge, SaleStatusBadge } from "@/components/status-badge";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { PAYMENT_METHOD_LABELS } from "@/lib/validators/sale";
 import type { SaleListResult } from "@/server/services/sales";
 
 export function SalesTable({
@@ -48,7 +47,9 @@ export function SalesTable({
                   {s.customerPhone && <span className="ml-1.5 text-xs text-gray-500">{s.customerPhone}</span>}
                 </TableCell>
               )}
-              <TableCell>{PAYMENT_METHOD_LABELS[s.paymentMethod]}</TableCell>
+              <TableCell>
+                <PaymentBadge method={s.paymentMethod} />
+              </TableCell>
               <TableCell className="text-gray-600">{s.soldByName}</TableCell>
               <TableCell className="text-right tabular-nums">{s.itemCount}</TableCell>
               <TableCell className={cn("text-right tabular-nums", s.status === "refunded" && "text-gray-400 line-through")}>

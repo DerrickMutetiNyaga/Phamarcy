@@ -74,10 +74,10 @@ export function ListToolbar({ searchPlaceholder, filters = [], dateRange, export
     filters.some((f) => !f.defaultValue && searchParams.get(f.key));
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm ring-1 ring-slate-200/80">
       {searchPlaceholder !== undefined && (
         <div className="relative w-64">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-gray-400" />
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-emerald-600" />
           <Input
             value={query}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -137,7 +137,7 @@ export function ListToolbar({ searchPlaceholder, filters = [], dateRange, export
         <Button
           variant="ghost"
           size="sm"
-          className="text-gray-500"
+          className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
           onClick={() => {
             setQuery("");
             const reset: Record<string, null> = { q: null, from: null, to: null };

@@ -37,12 +37,12 @@ export function Pagination({ page, pageSize, total }: PaginationProps) {
     return qs ? `${pathname}?${qs}` : pathname;
   }
 
-  const base = "inline-flex h-7 min-w-7 items-center justify-center rounded-md border px-2 text-xs";
-  const enabled = "border-gray-200 bg-white text-gray-700 hover:bg-gray-50";
-  const disabled = "pointer-events-none border-gray-100 bg-white text-gray-300";
+  const base = "inline-flex h-7 min-w-7 items-center justify-center rounded-md border px-2 text-xs font-medium";
+  const enabled = "border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800";
+  const disabled = "pointer-events-none border-slate-100 bg-white text-slate-300";
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-200 px-3 py-2 text-xs text-gray-500">
+    <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-3 py-2 text-xs text-slate-500">
       <span>
         {start}-{end} of {total.toLocaleString("en-US")}
       </span>
@@ -62,7 +62,7 @@ export function Pagination({ page, pageSize, total }: PaginationProps) {
                 href={href(p)}
                 scroll={false}
                 aria-current={p === page ? "page" : undefined}
-                className={cn(base, p === page ? "border-emerald-600 bg-emerald-600 text-white" : enabled)}
+                className={cn(base, p === page ? "border-emerald-600 bg-emerald-600 text-white shadow-sm shadow-emerald-700/20" : enabled)}
               >
                 {p}
               </Link>

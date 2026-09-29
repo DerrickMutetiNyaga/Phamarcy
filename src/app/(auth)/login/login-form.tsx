@@ -34,18 +34,32 @@ export function LoginForm({ next }: { next?: string }) {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormError message={error} />
       <Field label="Email" htmlFor="email" error={errors.email?.message}>
-        <Input id="email" type="email" autoComplete="username" autoFocus {...form.register("email")} aria-invalid={!!errors.email} />
+        <Input
+          id="email"
+          type="email"
+          autoComplete="username"
+          autoFocus
+          placeholder="you@pharmacy.com"
+          className="h-10"
+          {...form.register("email")}
+          aria-invalid={!!errors.email}
+        />
       </Field>
       <Field label="Password" htmlFor="password" error={errors.password?.message}>
         <Input
           id="password"
           type="password"
           autoComplete="current-password"
+          className="h-10"
           {...form.register("password")}
           aria-invalid={!!errors.password}
         />
       </Field>
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        className="h-10 w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-sm font-semibold hover:from-emerald-700 hover:to-teal-700"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? "Signing in..." : "Sign in"}
       </Button>
     </form>

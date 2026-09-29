@@ -1,5 +1,6 @@
 "use client";
 
+import { CircleHelp, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -9,11 +10,13 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/lib/client/api";
+import { cn } from "@/lib/utils";
 
 interface ConfirmDialogProps {
   trigger: React.ReactNode;
@@ -50,8 +53,16 @@ export function ConfirmDialog({
   return (
     <AlertDialog open={open} onOpenChange={(v) => !pending && setOpen(v)}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent
+        className={cn(
+          "before:absolute before:inset-x-0 before:top-0 before:h-1.5 before:bg-gradient-to-r",
+          destructive ? "before:from-red-500 before:to-rose-400" : "before:from-emerald-500 before:to-teal-500"
+        )}
+      >
         <AlertDialogHeader>
+          <AlertDialogMedia className={destructive ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-700"}>
+            {destructive ? <TriangleAlert /> : <CircleHelp />}
+          </AlertDialogMedia>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>

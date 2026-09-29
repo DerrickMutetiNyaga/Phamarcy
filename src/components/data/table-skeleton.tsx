@@ -9,7 +9,7 @@ export function TableSkeleton({ columns = 6, rows = 10, bare }: { columns?: numb
           <TableRow className="hover:bg-transparent">
             {Array.from({ length: columns }, (_, i) => (
               <TableHead key={i}>
-                <Skeleton className="h-3 w-16 bg-gray-200" />
+                <Skeleton className="h-3 w-16 bg-emerald-200/60" />
               </TableHead>
             ))}
           </TableRow>
@@ -33,9 +33,9 @@ export function TableSkeleton({ columns = 6, rows = 10, bare }: { columns?: numb
 export function PageSkeleton({ columns = 6 }: { columns?: number }) {
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Skeleton className="h-8 w-72 bg-gray-200" />
-        <Skeleton className="h-8 w-40 bg-gray-200" />
+      <div className="flex gap-2 rounded-xl bg-white p-2.5 shadow-sm ring-1 ring-slate-200/80">
+        <Skeleton className="h-8 w-64 bg-slate-100" />
+        <Skeleton className="h-8 w-40 bg-slate-100" />
       </div>
       <TableSkeleton columns={columns} />
     </div>

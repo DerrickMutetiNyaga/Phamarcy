@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { type FilterConfig, ListToolbar } from "@/components/data/list-toolbar";
+import { NAV_TABS_CLASS, navTabClass } from "@/components/data/nav-tabs";
 import { ReportTable } from "@/components/data/report-table";
 import { TableSkeleton } from "@/components/data/table-skeleton";
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
@@ -16,7 +17,6 @@ import {
   SALES_GROUP_LABELS,
   SALES_GROUPS,
 } from "@/lib/report-types";
-import { cn } from "@/lib/utils";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUSES } from "@/lib/validators/purchase";
 import { PAYMENT_METHOD_LABELS, PAYMENT_METHODS } from "@/lib/validators/sale";
 import { requireUser } from "@/server/auth";
@@ -114,16 +114,9 @@ export default async function ReportPage({
 
   return (
     <div className="space-y-4">
-      <nav className="flex gap-1 border-b border-gray-200" aria-label="Reports">
+      <nav className={NAV_TABS_CLASS} aria-label="Reports">
         {REPORT_TYPES.map((t) => (
-          <Link
-            key={t}
-            href={`/reports/${t}`}
-            className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-[13px] font-medium",
-              t === type ? "border-emerald-600 text-emerald-700" : "border-transparent text-gray-500 hover:text-gray-900"
-            )}
-          >
+          <Link key={t} href={`/reports/${t}`} className={navTabClass(t === type)}>
             {REPORT_LABELS[t]}
           </Link>
         ))}

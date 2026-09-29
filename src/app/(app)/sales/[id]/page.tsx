@@ -2,11 +2,10 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DetailGrid, Panel, PanelHeader } from "@/components/data/panel";
-import { PrescriptionStatusBadge, SaleStatusBadge } from "@/components/status-badge";
+import { PaymentBadge, PrescriptionStatusBadge, SaleStatusBadge } from "@/components/status-badge";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { COUNTER_ROLES } from "@/lib/auth/roles";
 import { formatDate, formatDateTime, formatMoney, round2 } from "@/lib/format";
-import { PAYMENT_METHOD_LABELS } from "@/lib/validators/sale";
 import { requireUser } from "@/server/auth";
 import { getSale } from "@/server/services/sales";
 import { getSettings } from "@/server/settings";
@@ -54,7 +53,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
             },
             { label: "Phone", value: sale.customerPhone || "-" },
             { label: "Status", value: <SaleStatusBadge status={sale.status} /> },
-            { label: "Payment method", value: PAYMENT_METHOD_LABELS[sale.paymentMethod] },
+            { label: "Payment method", value: <PaymentBadge method={sale.paymentMethod} /> },
             { label: "Cash received", value: sale.amountTendered !== null && sale.amountTendered !== undefined ? money(sale.amountTendered) : "-" },
             { label: "Change given", value: change !== null ? money(change) : "-" },
             { label: "Sold by", value: sale.soldBy?.name ?? "-" },

@@ -1,32 +1,59 @@
+import { CalendarClock, FileClock, PackageMinus, Receipt, Wallet, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { EmptyState, Panel, PanelHeader } from "@/components/data/panel";
-import { SaleStatusBadge, StockBadge } from "@/components/status-badge";
+import { PaymentBadge, SaleStatusBadge, StockBadge } from "@/components/status-badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { canAccessPage } from "@/lib/auth/access";
 import { INVENTORY_ROLES } from "@/lib/auth/roles";
 import { formatDateTime, formatMoney } from "@/lib/format";
-import { PAYMENT_METHOD_LABELS } from "@/lib/validators/sale";
+import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 import { getDashboardData } from "@/server/services/dashboard";
 import { getSettings } from "@/server/settings";
 import { RevenueChart } from "./revenue-chart";
 
-function Stat({ label, value, href, tone }: { label: string; value: string; href?: string; tone?: "warning" | "danger" }) {
+const STAT_TONES = {
+  emerald: { card: "from-emerald-50", icon: "bg-emerald-500 shadow-emerald-600/30", value: "text-emerald-950" },
+  sky: { card: "from-sky-50", icon: "bg-sky-500 shadow-sky-600/30", value: "text-sky-950" },
+  amber: { card: "from-amber-50", icon: "bg-amber-500 shadow-amber-600/30", value: "text-amber-700" },
+  rose: { card: "from-rose-50", icon: "bg-rose-500 shadow-rose-600/30", value: "text-rose-700" },
+  violet: { card: "from-violet-50", icon: "bg-violet-500 shadow-violet-600/30", value: "text-violet-700" },
+} as const;
+
+function Stat({
+  label,
+  value,
+  href,
+  icon: Icon,
+  tone,
+  note,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  icon: LucideIcon;
+  tone: keyof typeof STAT_TONES;
+  note?: string;
+}) {
+  const t = STAT_TONES[tone];
   const body = (
     <>
-      <p className="text-xs text-gray-500">{label}</p>
-      <p
-        className={
-          tone === "danger" ? "mt-1 text-xl font-semibold text-red-600" : tone === "warning" ? "mt-1 text-xl font-semibold text-amber-600" : "mt-1 text-xl font-semibold text-gray-900"
-        }
-      >
-        {value}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs font-medium text-slate-600">{label}</p>
+        <span className={cn("flex size-9 items-center justify-center rounded-xl text-white shadow-md", t.icon)}>
+          <Icon className="size-4.5" />
+        </span>
+      </div>
+      <p className={cn("mt-1 text-2xl font-bold tracking-tight tabular-nums", t.value)}>{value}</p>
+      {note && <p className="mt-0.5 text-[11px] text-slate-500">{note}</p>}
     </>
   );
-  const className = "block rounded-md border border-gray-200 bg-white px-4 py-3";
+  const className = cn(
+    "block rounded-xl border border-slate-200/80 bg-gradient-to-br to-white to-60% px-4 py-3.5 shadow-sm transition-all",
+    t.card
+  );
   return href ? (
-    <Link href={href} className={`${className} hover:border-gray-300`}>
+    <Link href={href} className={cn(className, "hover:-translate-y-0.5 hover:shadow-md")}>
       {body}
     </Link>
   ) : (
@@ -43,25 +70,38 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Stat label="Sales today" value={data.todaySalesCount.toLocaleString("en-US")} href={canOpenSales ? "/sales" : undefined} />
-        <Stat label="Revenue today" value={money(data.todayRevenue)} />
+        <Stat
+          label="Sales today"
+          value={data.todaySalesCount.toLocaleString("en-US")}
+          href={canOpenSales ? "/sales" : undefined}
+          icon={Receipt}
+          tone="emerald"
+          note="Completed invoices"
+        />
+        <Stat label="Revenue today" value={money(data.todayRevenue)} icon={Wallet} tone="sky" note="Including tax" />
         <Stat
           label="Low stock items"
           value={data.lowStockCount.toLocaleString("en-US")}
           href="/inventory?stock=low"
-          tone={data.lowStockCount > 0 ? "warning" : undefined}
+          icon={PackageMinus}
+          tone="amber"
+          note="At or below reorder level"
         />
         <Stat
           label="Expiring in 30 days"
           value={data.expiringSoonCount.toLocaleString("en-US")}
           href="/inventory/expiry?window=30"
-          tone={data.expiringSoonCount > 0 ? "danger" : undefined}
+          icon={CalendarClock}
+          tone="rose"
+          note="Open the expiry list"
         />
         <Stat
           label="Pending prescriptions"
           value={data.pendingPrescriptions.toLocaleString("en-US")}
           href="/prescriptions?status=pending"
-          tone={data.pendingPrescriptions > 0 ? "warning" : undefined}
+          icon={FileClock}
+          tone="violet"
+          note="Waiting for review"
         />
       </div>
 
@@ -155,7 +195,9 @@ export default async function DashboardPage() {
                   </TableCell>
                   <TableCell className="text-gray-600">{formatDateTime(s.createdAt)}</TableCell>
                   <TableCell>{s.customerName}</TableCell>
-                  <TableCell>{PAYMENT_METHOD_LABELS[s.paymentMethod]}</TableCell>
+                  <TableCell>
+                    <PaymentBadge method={s.paymentMethod} />
+                  </TableCell>
                   <TableCell className="text-gray-600">{s.soldByName}</TableCell>
                   <TableCell className="text-right tabular-nums">{s.itemCount}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(s.grandTotal)}</TableCell>

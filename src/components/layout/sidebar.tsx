@@ -23,7 +23,7 @@ export function Sidebar() {
           <p className="text-[11px] text-emerald-300/80">{ROLE_LABELS[user.role]} workspace</p>
         </div>
       </div>
-      <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4 [scrollbar-color:rgb(255_255_255/0.2)_transparent] [scrollbar-width:thin]">
         {sections.map((section) => (
           <div key={section.label}>
             <p className="px-2.5 pb-1.5 text-[11px] font-semibold tracking-wider text-emerald-300/60 uppercase">{section.label}</p>
