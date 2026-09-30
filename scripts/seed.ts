@@ -244,6 +244,38 @@ function prescriptionSvg(p: PrescriptionSeed, patient: string, date: Date): stri
 </svg>`;
 }
 
+function bundledPrescriptionImages(): { url: string; publicId: string }[] {
+  return PRESCRIPTIONS.map((_, i) => ({ url: `/sample-prescriptions/rx-${i + 1}.png`, publicId: "" }));
+}
+
+async function insertPrescriptions(
+  users: Record<UserKey, Types.ObjectId>,
+  customers: Record<CustomerKey, { name: string; phone: string }>,
+  images: { url: string; publicId: string }[]
+): Promise<Types.ObjectId[]> {
+  const ids: Types.ObjectId[] = [];
+  for (const [i, p] of PRESCRIPTIONS.entries()) {
+    const customer = customers[p.customer];
+    const createdAt = daysAgo(p.daysAgo, 9);
+    const reviewed = p.status !== "pending";
+    const doc = await Prescription.create({
+      customerName: customer.name,
+      phone: customer.phone,
+      imageUrl: images[i].url,
+      imagePublicId: images[i].publicId,
+      notes: p.doctor,
+      status: p.status,
+      reviewNote: p.reviewNote ?? (p.status === "verified" ? "Checked prescriber and dosage." : ""),
+      reviewedBy: reviewed ? users.pharmacist : null,
+      reviewedAt: reviewed ? new Date(createdAt.getTime() + 20 * 60 * 1000) : null,
+      uploadedBy: users.cashier,
+      createdAt,
+    });
+    ids.push(doc._id);
+  }
+  return ids;
+}
+
 async function uploadPrescriptionImage(svg: string, index: number): Promise<{ url: string; publicId: string }> {
   const dataUri = `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
   const res = await cloudinary.uploader.upload(dataUri, {
@@ -280,6 +312,32 @@ async function main() {
   }
 
   await mongoose.connect(process.env.MONGODB_URI.trim(), { serverSelectionTimeoutMS: 10_000 });
+
+  if (process.argv.includes("--prescriptions-only")) {
+    const cashier = await User.findOne({ email: "cashier@pharmacy.com" }).lean<{ _id: Types.ObjectId }>();
+    const pharmacist = await User.findOne({ email: "pharmacist@pharmacy.com" }).lean<{ _id: Types.ObjectId }>();
+    const admin = await User.findOne({ email: "admin@pharmacy.com" }).lean<{ _id: Types.ObjectId }>();
+    if (!cashier || !pharmacist || !admin) {
+      throw new Error("Sample staff accounts were not found. The original seed users must exist first.");
+    }
+    const party = {} as Record<CustomerKey, { name: string; phone: string }>;
+    for (const c of CUSTOMERS) {
+      const doc = await Customer.findOne({ phone: c.phone }).lean<{ name: string }>();
+      party[c.key] = { name: doc?.name ?? c.name, phone: c.phone };
+    }
+    const removed = await Prescription.deleteMany({ imageUrl: /^\/sample-prescriptions\// });
+    const ids = await insertPrescriptions(
+      { admin: admin._id, pharmacist: pharmacist._id, cashier: cashier._id },
+      party,
+      bundledPrescriptionImages()
+    );
+    const pending = PRESCRIPTIONS.filter((p) => p.status === "pending").length;
+    console.log(
+      `Connected to ${mongoose.connection.name}. Replaced ${removed.deletedCount} earlier samples with ${ids.length} prescriptions (${pending} pending).`
+    );
+    return;
+  }
+
   console.log(`Connected to ${mongoose.connection.name}. Clearing existing data...`);
 
   for (const name of mongoose.modelNames()) {
@@ -393,35 +451,21 @@ async function main() {
     }
   }
 
-  // Prescriptions need real images, so they are only created when Cloudinary is configured.
-  const prescriptionIds: (Types.ObjectId | null)[] = PRESCRIPTIONS.map(() => null);
+  // Without Cloudinary, the bundled images in public/sample-prescriptions are used.
   const cloud = getCloudinaryEnv();
+  let images: { url: string; publicId: string }[];
   if (cloud) {
     cloudinary.config({ cloud_name: cloud.cloudName, api_key: cloud.apiKey, api_secret: cloud.apiSecret, secure: true });
     console.log("Uploading sample prescription images to Cloudinary...");
+    images = [];
     for (const [i, p] of PRESCRIPTIONS.entries()) {
-      const customer = customers[p.customer];
-      const createdAt = daysAgo(p.daysAgo, 9);
-      const image = await uploadPrescriptionImage(prescriptionSvg(p, customer.name, createdAt), i);
-      const reviewed = p.status !== "pending";
-      const doc = await Prescription.create({
-        customerName: customer.name,
-        phone: customer.phone,
-        imageUrl: image.url,
-        imagePublicId: image.publicId,
-        notes: p.doctor,
-        status: p.status,
-        reviewNote: p.reviewNote ?? (p.status === "verified" ? "Checked prescriber and dosage." : ""),
-        reviewedBy: reviewed ? users.pharmacist : null,
-        reviewedAt: reviewed ? new Date(createdAt.getTime() + 20 * 60 * 1000) : null,
-        uploadedBy: users.cashier,
-        createdAt,
-      });
-      prescriptionIds[i] = doc._id;
+      images.push(await uploadPrescriptionImage(prescriptionSvg(p, customers[p.customer].name, daysAgo(p.daysAgo, 9)), i));
     }
   } else {
-    console.log("Cloudinary is not configured: skipping sample prescriptions and prescription-only items in seeded sales.");
+    console.log("Cloudinary is not configured: using the bundled sample prescription images.");
+    images = bundledPrescriptionImages();
   }
+  const prescriptionIds: (Types.ObjectId | null)[] = await insertPrescriptions(users, customers, images);
 
   let invoiceSeq = 0;
   for (const s of SALES) {
